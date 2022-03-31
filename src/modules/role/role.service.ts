@@ -5,7 +5,7 @@ import { RoleRepository } from './role.repository';
 
 @Injectable()
 export class RoleService {
-  constructor(private roleRepository: RoleRepository) {}
+  constructor(private roleRepository: RoleRepository) { }
 
   async create(role: Role): Promise<Role> {
     try {
@@ -24,5 +24,10 @@ export class RoleService {
       where: { active: true },
     });
     return roleDb;
+  }
+
+  async findAll(): Promise<Role[]> {
+    const listRole = await this.roleRepository.find({ where: { active: true } });
+    return listRole;
   }
 }

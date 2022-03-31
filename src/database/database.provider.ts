@@ -12,12 +12,9 @@ export const DatabaseProvider: DynamicModule = TypeOrmModule.forRootAsync({
       password: config.get('DB_PASSWORD'),
       database: config.get('DB_NAME'),
       host: config.get('DB_HOST'),
-      synchronize: true,
+      synchronize: (config.get('SYNCRONIZE') === 'TRUE'),
       autoLoadEntities: true,
     };
-
-    console.log(dbConfig);
-    
 
     return dbConfig;
   },

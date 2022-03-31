@@ -33,7 +33,7 @@ export class PersonService {
           );
 
           const roleDb = await this.roleServices.findOne(person.user.role.id);
-          if (roleDb) throw new NotFoundException('Role not found.');
+          if (!roleDb) throw new NotFoundException('Role not found.');
 
           const newUser = new User();
           newUser.email = person.user.email;
@@ -52,7 +52,13 @@ export class PersonService {
 
       return personCreated;
     } catch (error) {
+      console.log(error)
       throw new BadRequestException(error);
     }
+  }
+
+  async findAll(): Promise<Person[]> {
+    const listPerson = await this.personRepository.find();
+    return listPerson;
   }
 }

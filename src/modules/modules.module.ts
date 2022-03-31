@@ -18,5 +18,14 @@ import { ConfigService } from '@nestjs/config';
     PersonProjectModule,
     ProjectRequirementModule,
   ],
+  exports: [
+    RoleModule,
+    UserModule,
+    PersonModule,
+    RequirementModule,
+    ProjectModule,
+    PersonProjectModule,
+    ProjectRequirementModule,
+  ]
 })
 export class ModulesModule {}
