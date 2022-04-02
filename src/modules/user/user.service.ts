@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+
 import { User } from './user.entity';
 import { UserRepository } from './user.repository';
 
@@ -10,6 +11,15 @@ export class UserService {
     const userDb = await this.userRepository.findOne({
       relations: ['role'],
       where: { email: email, role: { id: roleId }, active: true },
+    });
+
+    return userDb;
+  }
+
+  async findByEmail(email: string): Promise<User> {
+    const userDb = await this.userRepository.findOne({
+      relations: ['role'],
+      where: { email: email, active: true },
     });
 
     return userDb;
