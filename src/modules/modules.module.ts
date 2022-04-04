@@ -5,8 +5,6 @@ import { PersonModule } from './person/person.module';
 import { RequirementModule } from './requirement/requirement.module';
 import { ProjectModule } from './project/project.module';
 import { PersonProjectModule } from './person-project/person-project.module';
-import { ProjectRequirementModule } from './project-requirement/project-requirement.module';
-import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -16,7 +14,6 @@ import { ConfigService } from '@nestjs/config';
     RequirementModule,
     ProjectModule,
     PersonProjectModule,
-    ProjectRequirementModule,
   ],
   exports: [
     RoleModule,
@@ -25,7 +22,6 @@ import { ConfigService } from '@nestjs/config';
     RequirementModule,
     ProjectModule,
     PersonProjectModule,
-    ProjectRequirementModule,
   ]
 })
 export class ModulesModule {}

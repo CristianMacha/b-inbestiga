@@ -3,10 +3,12 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { PersonProject } from '../person-project/person-project.entity';
 import { User } from '../user/user.entity';
 
 @Entity()
@@ -29,4 +31,7 @@ export class Person {
   @OneToOne(() => User)
   @JoinColumn()
   user: User;
+
+  @OneToMany(() => PersonProject, personProject => personProject.person)
+  personProjects: PersonProject[];
 }
