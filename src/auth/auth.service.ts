@@ -14,7 +14,7 @@ export class AuthService {
     private userServices: UserService,
     private bcryptServices: BcryptService,
     private jwtServices: JwtService,
-  ) {}
+  ) { }
 
   async signin(email: string, password: string) {
     try {
@@ -25,7 +25,7 @@ export class AuthService {
         userDb.password,
         password,
       );
-      if (!userDb) throw new ForbiddenException();
+      if (!matchedPassword) throw new ForbiddenException();
 
       const token = await this.jwtServices.signAsync({
         email: userDb.email,
