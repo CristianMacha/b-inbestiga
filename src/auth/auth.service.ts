@@ -22,8 +22,8 @@ export class AuthService {
       if (!userDb) throw new ForbiddenException();
 
       const matchedPassword = await this.bcryptServices.decrypt(
-        userDb.password,
         password,
+        userDb.password,
       );
       if (!matchedPassword) throw new ForbiddenException();
 

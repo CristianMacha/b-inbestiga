@@ -10,10 +10,13 @@ export class Project {
     @Column({ nullable: false })
     name: string;
 
+    @Column({ nullable: false, default: true })
+    inProgress: boolean;
+
     @Column({ nullable: false })
     status: string;
 
-    @Column({ nullable: false, default: true})
+    @Column({ nullable: false, default: true })
     active: boolean;
 
     @CreateDateColumn()
