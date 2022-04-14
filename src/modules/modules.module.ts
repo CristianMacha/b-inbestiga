@@ -5,6 +5,7 @@ import { PersonModule } from './person/person.module';
 import { RequirementModule } from './requirement/requirement.module';
 import { ProjectModule } from './project/project.module';
 import { PersonProjectModule } from './person-project/person-project.module';
+import { PetitionModule } from './petition/petition.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { PersonProjectModule } from './person-project/person-project.module';
     RequirementModule,
     ProjectModule,
     PersonProjectModule,
+    PetitionModule,
   ],
   exports: [
     RoleModule,
