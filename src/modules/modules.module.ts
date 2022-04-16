@@ -24,6 +24,7 @@ import { PetitionModule } from './petition/petition.module';
     RequirementModule,
     ProjectModule,
     PersonProjectModule,
+    PetitionModule,
   ]
 })
 export class ModulesModule {}

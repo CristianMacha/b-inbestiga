@@ -15,6 +15,9 @@ export class Petition {
   name: string;
 
   @Column()
+  email: string;
+
+  @Column()
   phone: string;
 
   @Column()
