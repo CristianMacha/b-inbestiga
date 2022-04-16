@@ -26,6 +26,9 @@ export class Petition {
   @Column({ default: true })
   active: boolean;
 
+  @Column({ nullable: false, default: false })
+  accepted: boolean;
+
   @CreateDateColumn()
   createdAt: Date;
 
