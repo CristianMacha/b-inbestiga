@@ -5,8 +5,8 @@ import {
 } from '@nestjs/common';
 import { getConnection } from 'typeorm';
 
-import { NanoidService } from '../../helpers/nanoid.service';
-import { BcryptService } from '../../helpers/bcrypt.service';
+import { NanoidService } from '../../core/helpers/nanoid.service';
+import { BcryptService } from '../../core/helpers/bcrypt.service';
 import { PersonRepository } from './person.repository';
 import { Person } from './person.entity';
 import { RoleService } from '../role/role.service';

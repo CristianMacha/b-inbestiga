@@ -4,7 +4,7 @@ import { AppService } from './app.service';
 import { DatabaseModule } from './database/database.module';
 import { ModulesModule } from './modules/modules.module';
 import { AuthModule } from './auth/auth.module';
-import { HelpersModule } from './helpers/helpers.module';
+import { HelpersModule } from './core/helpers/helpers.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({

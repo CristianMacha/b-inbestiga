@@ -1,4 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { getConnection } from 'typeorm';
+import { Invoice } from '../invoice/invoice.entity';
 import { Project } from './project.entity';
 import { ProjectRepository } from './project.repository';
 
@@ -10,9 +12,18 @@ export class ProjectService {
 
     async create(project: Project): Promise<Project> {
         try {
-            const newProject = this.projectRepository.create(project);
-            const newProjectCreated = await this.projectRepository.save(newProject);
-            return newProjectCreated;
+            const connection = getConnection();
+            const projectCreated = await connection.transaction('SERIALIZABLE', async manager => {
+                const newProject = this.projectRepository.create(project);
+                const newProjectCreated = await manager.save(newProject);
+                
+                const newInvoice = new Invoice();
+                newInvoice.total = project.invoice.total;
+                await manager.save(newInvoice);
+
+                return newProjectCreated;
+            });
+            return projectCreated;
         } catch (error) {
             throw new BadRequestException(error);
         }

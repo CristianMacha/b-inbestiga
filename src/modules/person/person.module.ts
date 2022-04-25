@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { HelpersModule } from '../../helpers/helpers.module';
+import { HelpersModule } from '../../core/helpers/helpers.module';
 import { RoleModule } from '../role/role.module';
 import { PersonController } from './person.controller';
 import { PersonRepository } from './person.repository';

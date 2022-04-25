@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import { HelpersModule } from '../helpers/helpers.module';
+import { HelpersModule } from '../core/helpers/helpers.module';
 import { UserModule } from '../modules/user/user.module';
 import { AuthController } from './auth.controller';
 import { AuthProvider } from './auth.provider';
