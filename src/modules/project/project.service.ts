@@ -14,12 +14,13 @@ export class ProjectService {
         try {
             const connection = getConnection();
             const projectCreated = await connection.transaction('SERIALIZABLE', async manager => {
-                const newProject = this.projectRepository.create(project);
-                const newProjectCreated = await manager.save(newProject);
-                
                 const newInvoice = new Invoice();
                 newInvoice.total = project.invoice.total;
-                await manager.save(newInvoice);
+                const invoiceCreated = await manager.save(newInvoice);
+                
+                const newProject = this.projectRepository.create(project);
+                newProject.invoice = invoiceCreated;
+                const newProjectCreated = await manager.save(newProject);
 
                 return newProjectCreated;
             });
