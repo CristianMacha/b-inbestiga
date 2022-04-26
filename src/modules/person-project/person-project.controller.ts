@@ -20,4 +20,9 @@ export class PersonProjectController {
     async findOne(@Param('id') id: string): Promise<PersonProject> {
         return await this.personProjectServices.findOne(+id);
     }
+
+    @Get('person/:id')
+    async findByPerson(@Param('id') id: string): Promise<PersonProject[]> {
+        return await this.personProjectServices.findByPerson(+id);
+    }
 }

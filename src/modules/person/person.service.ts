@@ -61,4 +61,13 @@ export class PersonService {
     const listPerson = await this.personRepository.find();
     return listPerson;
   }
+
+  async findOne(personId: number): Promise<Person> {
+    try {
+      const personDb = await this.personRepository.findOne(personId);
+      return personDb;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
 }

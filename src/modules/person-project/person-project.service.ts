@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadGatewayException,
+  BadRequestException,
+  Injectable,
+} from '@nestjs/common';
+
 import { PersonProject } from './person-project.entity';
 import { PersonProjectRepository } from './person-project.repository';
 
@@ -44,6 +49,20 @@ export class PersonProjectService {
       return personProjectDb;
     } catch (error) {
       throw new BadRequestException(error);
+    }
+  }
+
+  async findByPerson(personId: number): Promise<PersonProject[]> {
+    try {
+      const listPersonProject = await this.personProjectRepository.find({
+        relations: ['project'],
+        where: { person: { id: personId } },
+        order: { createdAt: 'DESC' },
+      });
+
+      return listPersonProject;
+    } catch (error) {
+      throw new BadGatewayException(error);
     }
   }
 }
