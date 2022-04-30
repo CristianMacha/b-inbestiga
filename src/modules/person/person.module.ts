@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { HelpersModule } from '../../core/helpers/helpers.module';
+import { CoreModule } from '../../core/core.module';
 import { RoleModule } from '../role/role.module';
 import { PersonController } from './person.controller';
 import { PersonRepository } from './person.repository';
@@ -10,7 +10,7 @@ import { PersonService } from './person.service';
 @Module({
   imports: [
     TypeOrmModule.forFeature([PersonRepository]),
-    HelpersModule,
+    CoreModule,
     RoleModule,
   ],
   controllers: [PersonController],

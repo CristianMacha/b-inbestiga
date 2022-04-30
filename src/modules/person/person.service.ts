@@ -52,7 +52,6 @@ export class PersonService {
 
       return personCreated;
     } catch (error) {
-      console.log(error)
       throw new BadRequestException(error);
     }
   }
@@ -65,6 +64,18 @@ export class PersonService {
   async findOne(personId: number): Promise<Person> {
     try {
       const personDb = await this.personRepository.findOne(personId);
+      return personDb;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+
+  async findOneByUser(userId: number): Promise<Person> {
+    try {
+      const personDb = await this.personRepository.findOne({
+        where: { user: { id: userId }}
+      });
+
       return personDb;
     } catch (error) {
       throw new BadRequestException(error);

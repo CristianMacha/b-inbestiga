@@ -10,6 +10,9 @@ export class PersonProject {
     @Column({ nullable: false, default: true })
     active: boolean;
 
+    @Column({ nullable: false, default: false })
+    isAdvisor: boolean;
+
     @CreateDateColumn()
     createdAt: Date;
 

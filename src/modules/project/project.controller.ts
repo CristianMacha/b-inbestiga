@@ -1,18 +1,21 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
 
+import { JwtAuthGuard } from '../../core/guards/jwt-auth.guard';
 import { Person } from '../person/person.entity';
 import { Project } from './project.entity';
 import { ProjectService } from './project.service';
 
 @Controller('project')
 export class ProjectController {
-  constructor(private projectServices: ProjectService) {}
+  constructor(private projectServices: ProjectService) { }
 
+  @UseGuards(JwtAuthGuard)
   @Post()
   async create(
     @Body() data: { project: Project, person: Person },
+    @Req() req
   ): Promise<Project> {
-    return await this.projectServices.create(data.project, data.person);
+    return await this.projectServices.create(data.project, data.person, req.user);
   }
 
   @Get()

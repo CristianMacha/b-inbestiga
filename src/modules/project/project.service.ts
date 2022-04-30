@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { IPayloadJwt } from 'src/core/interfaces/payload-jwt.interface';
 import { getConnection } from 'typeorm';
 
 import { Invoice } from '../invoice/invoice.entity';
@@ -15,32 +16,40 @@ export class ProjectService {
         private personService: PersonService,
     ) { }
 
-    async create(project: Project, person: Person): Promise<Project> {
+    async create(project: Project, person: Person, authUser: Person): Promise<Project> {
         try {
             const connection = getConnection();
             const projectCreated = await connection.transaction('SERIALIZABLE', async manager => {
                 const personDb = await this.personService.findOne(person.id);
-                if(!personDb) throw new NotFoundException('Person not found.');
+                if (!personDb) throw new NotFoundException('Person not found.');
 
                 const newInvoice = new Invoice();
                 newInvoice.total = project.invoice.total;
                 const invoiceCreated = await manager.save(newInvoice);
-                
+
                 const newProject = this.projectRepository.create(project);
                 newProject.invoice = invoiceCreated;
                 const newProjectCreated = await manager.save(newProject);
 
+                // Asignar estudiante
                 const newPersonProject = new PersonProject();
                 newPersonProject.person = personDb;
                 newPersonProject.project = newProjectCreated;
                 await manager.save(newPersonProject);
+
+                // Asignar asesor
+                const newAdvisor = new PersonProject();
+                newAdvisor.person = authUser;
+                newAdvisor.project = newProjectCreated;
+                newAdvisor.isAdvisor = true;
+                await manager.save(newAdvisor);
 
                 return newProjectCreated;
             });
             return projectCreated;
         } catch (error) {
             console.log(error);
-            
+
             throw new BadRequestException(error);
         }
     }
@@ -56,7 +65,9 @@ export class ProjectService {
 
     async findOne(projectId: number): Promise<Project> {
         try {
-            const projectDb = await this.projectRepository.findOne(projectId);
+            const projectDb = await this.projectRepository.findOne(projectId, {
+                relations: ['personProjects', 'personProjects.person'],
+            });
             return projectDb;
         } catch (error) {
             throw new BadRequestException(error);
