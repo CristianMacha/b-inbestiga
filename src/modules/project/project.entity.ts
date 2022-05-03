@@ -8,6 +8,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Commentary } from '../commentary/commentary.entity';
+
 import { Invoice } from '../invoice/invoice.entity';
 import { PersonProject } from '../person-project/person-project.entity';
 import { Requirement } from '../requirement/requirement.entity';
@@ -44,4 +46,7 @@ export class Project {
   @OneToOne(() => Invoice, { nullable: false })
   @JoinColumn()
   invoice: Invoice;
+
+  @OneToMany(() => Commentary, commentary => commentary.project)
+  commentaries: Commentary[];
 }
