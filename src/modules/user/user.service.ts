@@ -9,7 +9,6 @@ export class UserService {
 
   async findOneByEmailAndRole(email: string, roleId: number): Promise<User> {
     const userDb = await this.userRepository.findOne({
-      relations: ['role'],
       where: { email: email, role: { id: roleId }, active: true },
     });
 
@@ -18,7 +17,6 @@ export class UserService {
 
   async findByEmail(email: string): Promise<User> {
     const userDb = await this.userRepository.findOne({
-      relations: ['role'],
       where: { email: email, active: true },
     });
 

@@ -28,7 +28,9 @@ export class InvoiceService {
 
   async findOne(invoiceId: number): Promise<Invoice> {
     try {
-      const invoiceDb = await this.invoiceRepository.findOne(invoiceId);
+      const invoiceDb = await this.invoiceRepository.findOne(invoiceId, {
+        relations: ['fees'],
+      });
       return invoiceDb;
     } catch (error) {
       throw new BadRequestException(error);
