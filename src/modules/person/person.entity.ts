@@ -8,6 +8,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Commentary } from '../commentary/commentary.entity';
 import { PersonProject } from '../person-project/person-project.entity';
 import { User } from '../user/user.entity';
 
@@ -37,4 +38,7 @@ export class Person {
 
   @OneToMany(() => PersonProject, personProject => personProject.person)
   personProjects: PersonProject[];
+
+  @OneToMany(() => Commentary, commentary => commentary.person)
+  commentaries: Commentary[];
 }

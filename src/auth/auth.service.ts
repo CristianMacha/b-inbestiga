@@ -25,6 +25,7 @@ export class AuthService {
         password,
         userDb.password,
       );
+      
       if (!matchedPassword) throw new ForbiddenException();
 
       const token = await this.jwtServices.signAsync({
