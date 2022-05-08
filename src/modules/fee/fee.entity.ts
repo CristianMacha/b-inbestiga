@@ -25,6 +25,12 @@ export class Fee {
   })
   status: EStatusPay;
 
+  @Column()
+  fileName: string;
+
+  @Column()
+  url: string;
+
   @Column({ nullable: false, default: true })
   active: boolean;
 
@@ -34,6 +40,6 @@ export class Fee {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToOne(() => Invoice, invoice => invoice.fees, { nullable: false })
+  @ManyToOne(() => Invoice, (invoice) => invoice.fees, { nullable: false })
   invoice: Invoice;
 }

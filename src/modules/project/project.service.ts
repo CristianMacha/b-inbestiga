@@ -47,7 +47,10 @@ export class ProjectService {
 
     async findAll(): Promise<Project[]> {
         try {
-            const listProject = await this.projectRepository.find({ where: { active: true } });
+            const listProject = await this.projectRepository.find({ 
+                relations: ['personProjects', 'personProjects.person'],
+                where: { active: true }
+             });
             return listProject;
         } catch (error) {
             throw new BadRequestException(error);
@@ -56,7 +59,9 @@ export class ProjectService {
 
     async findOne(projectId: number): Promise<Project> {
         try {
-            const projectDb = await this.projectRepository.findOne(projectId);
+            const projectDb = await this.projectRepository.findOne(projectId, {
+                relations: ['personProjects', 'personProjects.person']
+            });
             return projectDb;
         } catch (error) {
             throw new BadRequestException(error);

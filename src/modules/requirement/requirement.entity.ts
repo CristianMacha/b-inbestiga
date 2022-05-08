@@ -13,6 +13,9 @@ export class Requirement {
     @Column({ nullable: false })
     filename: string;
 
+    @Column()
+    url: string;
+
     @Column({ nullable: false, default: true })
     active: boolean;
 

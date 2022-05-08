@@ -21,6 +21,12 @@ export class Petition {
   phone: string;
 
   @Column()
+  fileName: string;
+
+  @Column()
+  url: string;
+
+  @Column()
   category: string;
 
   @Column()

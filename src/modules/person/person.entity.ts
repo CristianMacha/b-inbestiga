@@ -22,6 +22,9 @@ export class Person {
   @Column({ nullable: false })
   code: string;
 
+  @Column()
+  phone: string;
+
   @CreateDateColumn()
   createdAt: Date;
 
