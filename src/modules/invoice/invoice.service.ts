@@ -23,7 +23,9 @@ export class InvoiceService {
 
   async findAll(): Promise<Invoice[]> {
     try {
-      const listInvoice = await this.invoiceRepository.find();
+      const listInvoice = await this.invoiceRepository.find({
+        relations: ['project']
+      });
       return listInvoice;
     } catch (error) {
       throw new BadRequestException(error);
