@@ -9,6 +9,7 @@ import { PetitionModule } from './petition/petition.module';
 import { InvoiceModule } from './invoice/invoice.module';
 import { FeeModule } from './fee/fee.module';
 import { CommentaryModule } from './commentary/commentary.module';
+import { PersonRoleModule } from './person-role/person-role.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { CommentaryModule } from './commentary/commentary.module';
     InvoiceModule,
     FeeModule,
     CommentaryModule,
+    PersonRoleModule,
   ],
   exports: [
     RoleModule,

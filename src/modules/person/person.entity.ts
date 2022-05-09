@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { Commentary } from '../commentary/commentary.entity';
 import { PersonProject } from '../person-project/person-project.entity';
+import { PersonRole } from '../person-role/person-role.entity';
 import { User } from '../user/user.entity';
 
 @Entity()
@@ -23,7 +24,7 @@ export class Person {
   @Column({ nullable: false })
   code: string;
 
-  @Column()
+  @Column({ nullable: true })
   phone: string;
 
   @CreateDateColumn()
@@ -36,9 +37,12 @@ export class Person {
   @JoinColumn()
   user: User;
 
-  @OneToMany(() => PersonProject, personProject => personProject.person)
+  @OneToMany(() => PersonProject, (personProject) => personProject.person)
   personProjects: PersonProject[];
 
-  @OneToMany(() => Commentary, commentary => commentary.person)
+  @OneToMany(() => Commentary, (commentary) => commentary.person)
   commentaries: Commentary[];
+
+  @OneToMany(() => PersonRole, (personRole) => personRole.person)
+  personRoles: PersonRole[];
 }

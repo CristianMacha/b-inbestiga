@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { User } from './user.entity';
 import { UserRepository } from './user.repository';
@@ -7,9 +7,9 @@ import { UserRepository } from './user.repository';
 export class UserService {
   constructor(private userRepository: UserRepository) {}
 
-  async findOneByEmailAndRole(email: string, roleId: number): Promise<User> {
+  async findOneByEmail(email: string, roleId: number): Promise<User> {
     const userDb = await this.userRepository.findOne({
-      where: { email: email, role: { id: roleId }, active: true },
+      where: { email: email, active: true },
     });
 
     return userDb;
@@ -21,5 +21,14 @@ export class UserService {
     });
 
     return userDb;
+  }
+
+  async findOne(userId: number): Promise<User> {
+    try {
+      const userDb = await this.userRepository.findOne(userId);
+      return userDb;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
 }

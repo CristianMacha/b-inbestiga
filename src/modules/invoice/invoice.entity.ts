@@ -4,6 +4,7 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -43,6 +44,9 @@ export class Invoice {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => Fee, fee => fee.invoice)
+  @ManyToOne(() => Project, (project) => project.invoices, { nullable: false })
+  project: Project;
+
+  @OneToMany(() => Fee, (fee) => fee.invoice)
   fees: Fee[];
 }

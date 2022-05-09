@@ -15,21 +15,24 @@ export class ProjectService {
         private personService: PersonService,
     ) { }
 
-    async create(project: Project, person: Person, authUser: Person): Promise<Project> {
+    async create(project: Project, person: Person, authUser: Person): Promise<Project> {        
         try {
             const connection = getConnection();
             const projectCreated = await connection.transaction('SERIALIZABLE', async manager => {
                 const personDb = await this.personService.findOne(person.id);
                 if (!personDb) throw new NotFoundException('Person not found.');
-
-                const newInvoice = new Invoice();
-                newInvoice.total = project.invoice.total;
-                const invoiceCreated = await manager.save(newInvoice);
-
+                
                 const newProject = this.projectRepository.create(project);
-                newProject.invoice = invoiceCreated;
                 const newProjectCreated = await manager.save(newProject);
 
+                for await (const invoice of project.invoices) {
+                    const newInvoice = new Invoice();
+                    newInvoice.total = invoice.total;
+                    newInvoice.description = invoice.description;
+                    newInvoice.project = newProjectCreated;
+                    await manager.save(newInvoice);
+                }
+                
                 // Asignar estudiante
                 const newPersonProject = new PersonProject();
                 newPersonProject.person = personDb;
@@ -78,6 +81,17 @@ export class ProjectService {
         try {
             const listProject = await this.projectRepository.findByPerson(personId);
             return listProject;
+        } catch (error) {
+            throw new BadRequestException(error);
+        }
+    }
+
+    async update(project: Project): Promise<Project> {
+        try {
+            const projectDb = await this.projectRepository.preload(project);
+            if(!projectDb) { throw new NotFoundException('Project not found.') };
+            const projecUpdated = await this.projectRepository.save(projectDb);
+            return projecUpdated;
         } catch (error) {
             throw new BadRequestException(error);
         }

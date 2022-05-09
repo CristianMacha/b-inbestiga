@@ -43,10 +43,9 @@ export class Project {
   @OneToMany(() => Requirement, (requirement) => requirement)
   requirements: Requirement[];
 
-  @OneToOne(() => Invoice, { nullable: false })
-  @JoinColumn()
-  invoice: Invoice;
+  @OneToMany(() => Invoice, (invoice) => invoice.project)
+  invoices: Invoice[];
 
-  @OneToMany(() => Commentary, commentary => commentary.project)
+  @OneToMany(() => Commentary, (commentary) => commentary.project)
   commentaries: Commentary[];
 }

@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { PersonModule } from 'src/modules/person/person.module';
 
 import { CoreModule } from '../core/core.module';
 import { UserModule } from '../modules/user/user.module';
@@ -12,6 +13,7 @@ import { JwtStrategy } from './passport/jwt.strategy';
   imports: [
     AuthProvider,
     UserModule,
+    PersonModule,
     CoreModule,
   ],
   controllers: [AuthController],

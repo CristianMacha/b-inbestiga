@@ -11,6 +11,7 @@ import { PersonRepository } from './person.repository';
 import { Person } from './person.entity';
 import { RoleService } from '../role/role.service';
 import { User } from '../user/user.entity';
+import { PersonRole } from '../person-role/person-role.entity';
 
 @Injectable()
 export class PersonService {
@@ -32,20 +33,30 @@ export class PersonService {
             userCode,
           );
 
-          const roleDb = await this.roleServices.findOne(person.user.role.id);
-          if (!roleDb) throw new NotFoundException('Role not found.');
+          for await (const personRole of person.personRoles) {
+            const roleDb = await this.roleServices.findOne(personRole.role.id);
+            if (!roleDb) throw new NotFoundException('Role not found.');
+          }
 
           const newUser = new User();
           newUser.email = person.user.email;
           newUser.password = passwordHashed;
-          newUser.role = roleDb;
           const newUserCreated = await manager.save(newUser);
 
           const newPerson = new Person();
           newPerson.fullname = person.fullname;
+          newPerson.phone = person.phone;
           newPerson.code = userCode;
           newPerson.user = newUserCreated;
           const newPersonCreated = await manager.save(newPerson);
+
+          for await (const personRole of person.personRoles) {
+            const newPersonRole = new PersonRole();
+            newPersonRole.person = newPersonCreated;
+            newPersonRole.role = personRole.role;
+            await manager.save(newPersonRole);
+          }
+
           return newPersonCreated;
         },
       );
@@ -57,7 +68,9 @@ export class PersonService {
   }
 
   async findAll(): Promise<Person[]> {
-    const listPerson = await this.personRepository.find();
+    const listPerson = await this.personRepository.find({
+      relations: ['personRoles', 'personRoles.role'],
+    });
     return listPerson;
   }
 
@@ -73,10 +86,19 @@ export class PersonService {
   async findOneByUser(userId: number): Promise<Person> {
     try {
       const personDb = await this.personRepository.findOne({
-        where: { user: { id: userId }}
+        where: { user: { id: userId } },
       });
 
       return personDb;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+
+  async findAllByRole(roleId: number): Promise<Person[]> {
+    try {
+      const listPerson = await this.personRepository.findAllByRole(roleId);
+      return listPerson;
     } catch (error) {
       throw new BadRequestException(error);
     }

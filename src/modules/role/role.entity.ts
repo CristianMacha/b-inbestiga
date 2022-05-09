@@ -1,23 +1,31 @@
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { User } from "../user/user.entity";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+
+import { PersonRole } from '../person-role/person-role.entity';
 
 @Entity()
 export class Role {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column({ nullable: false, unique: true })
-    name: string;
+  @Column({ nullable: false, unique: true })
+  name: string;
 
-    @Column({ nullable: false, default: true })
-    active: boolean;
+  @Column({ nullable: false, default: true })
+  active: boolean;
 
-    @CreateDateColumn()
-    createdAt: Date;
+  @CreateDateColumn()
+  createdAt: Date;
 
-    @UpdateDateColumn()
-    updatedAt: Date;
+  @UpdateDateColumn()
+  updatedAt: Date;
 
-    @OneToMany(() => User, user => user.role)
-    users: User[];
+  @OneToMany(() => PersonRole, (personRole) => personRole.role)
+  personRoles: PersonRole[];
 }

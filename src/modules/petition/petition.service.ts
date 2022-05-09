@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Petition } from './petition.entity';
 import { PetitionRepository } from './petition.repository';
 
@@ -29,6 +29,18 @@ export class PetitionService {
         try {
             const petitionDb = await this.petitionRepository.findOne(petitionId);
             return petitionDb;
+        } catch (error) {
+            throw new BadRequestException(error);
+        }
+    }
+    
+    async update(petition: Petition): Promise<Petition> {
+        try {
+            const petitionDb = await this.petitionRepository.preload(petition);
+            if(!petitionDb) { throw new NotFoundException('Petition not found.') }
+
+            const petitionUpdated = await this.petitionRepository.save(petitionDb);
+            return petitionUpdated;
         } catch (error) {
             throw new BadRequestException(error);
         }

@@ -5,6 +5,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { EPetitionStatus } from './enum/petition-status.enum';
 
 @Entity()
 export class Petition {
@@ -19,6 +20,13 @@ export class Petition {
 
   @Column()
   phone: string;
+
+  @Column({
+    type: 'enum',
+    enum: EPetitionStatus,
+    default: EPetitionStatus.PENDING,
+  })
+  status: EPetitionStatus;
 
   @Column()
   fileName: string;

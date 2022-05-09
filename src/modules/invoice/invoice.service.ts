@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { Invoice } from './invoice.entity';
 import { InvoiceRepository } from './invoice.repository';
@@ -32,6 +36,20 @@ export class InvoiceService {
         relations: ['fees'],
       });
       return invoiceDb;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+
+  async update(invoice: Invoice): Promise<Invoice> {
+    try {
+      const invoiceDb = await this.invoiceRepository.preload(invoice);
+      if (!invoiceDb) {
+        throw new NotFoundException('Invoice not found.');
+      }
+
+      const invoiceUpdated = await this.invoiceRepository.save(invoiceDb);
+      return invoiceUpdated;
     } catch (error) {
       throw new BadRequestException(error);
     }

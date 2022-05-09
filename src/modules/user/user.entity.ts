@@ -8,7 +8,6 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Role } from '../role/role.entity';
 
 @Entity()
 export class User {
@@ -29,7 +28,4 @@ export class User {
 
   @UpdateDateColumn()
   updatedAt: Date;
-
-  @ManyToOne(() => Role, role => role.users, { nullable: false })
-  role: Role;
 }
