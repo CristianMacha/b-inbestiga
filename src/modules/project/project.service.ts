@@ -15,7 +15,7 @@ export class ProjectService {
         private personService: PersonService,
     ) { }
 
-    async create(project: Project, person: Person, authUser: Person): Promise<Project> {        
+    async create(project: Project, person: Person, authUser: Person, asesor: Person): Promise<Project> {        
         try {
             const connection = getConnection();
             const projectCreated = await connection.transaction('SERIALIZABLE', async manager => {
@@ -40,11 +40,20 @@ export class ProjectService {
                 await manager.save(newPersonProject);
 
                 // Asignar asesor
-                const newAdvisor = new PersonProject();
-                newAdvisor.person = authUser;
-                newAdvisor.project = newProjectCreated;
-                newAdvisor.isAdvisor = true;
-                await manager.save(newAdvisor);
+                const asesorDb = await this.personService.findOne(asesor.id);
+                if(asesorDb) {
+                    const newAdvisor = new PersonProject();
+                    newAdvisor.person = asesorDb;
+                    newAdvisor.project = newProjectCreated;
+                    newAdvisor.isAdvisor = true;
+                    await manager.save(newAdvisor);
+                } else {
+                    const newAdvisor = new PersonProject();
+                    newAdvisor.person = authUser;
+                    newAdvisor.project = newProjectCreated;
+                    newAdvisor.isAdvisor = true;
+                    await manager.save(newAdvisor);
+                }
 
                 return newProjectCreated;
             });

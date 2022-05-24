@@ -35,7 +35,7 @@ export class InvoiceService {
   async findOne(invoiceId: number): Promise<Invoice> {
     try {
       const invoiceDb = await this.invoiceRepository.findOne(invoiceId, {
-        relations: ['fees'],
+        relations: ['fees', 'project'],
       });
       return invoiceDb;
     } catch (error) {

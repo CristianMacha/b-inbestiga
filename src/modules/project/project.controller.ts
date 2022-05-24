@@ -21,13 +21,14 @@ export class ProjectController {
   @UseGuards(JwtAuthGuard)
   @Post()
   async create(
-    @Body() data: { project: Project; person: Person },
+    @Body() data: { project: Project; person: Person, asesor: Person },
     @Req() req,
   ): Promise<Project> {
     return await this.projectServices.create(
       data.project,
       data.person,
       req.user,
+      data.asesor
     );
   }
 
