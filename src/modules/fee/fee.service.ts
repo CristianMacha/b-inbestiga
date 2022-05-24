@@ -23,7 +23,9 @@ export class FeeService {
 
   async findAll(): Promise<Fee[]> {
     try {
-      const listFee = await this.feeRepository.find();
+      const listFee = await this.feeRepository.find({
+        relations: ['person']
+      });
       return listFee;
     } catch (error) {
       throw new BadRequestException(error);
@@ -32,7 +34,9 @@ export class FeeService {
 
   async findOne(feeId: number): Promise<Fee> {
     try {
-      const feeDb = await this.feeRepository.findOne(feeId);
+      const feeDb = await this.feeRepository.findOne(feeId, {
+        relations: ['person']
+      });
       return feeDb;
     } catch (error) {
       throw new BadRequestException(error);

@@ -9,6 +9,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Commentary } from '../commentary/commentary.entity';
+import { Fee } from '../fee/fee.entity';
 import { PersonProject } from '../person-project/person-project.entity';
 import { PersonRole } from '../person-role/person-role.entity';
 import { User } from '../user/user.entity';
@@ -45,4 +46,7 @@ export class Person {
 
   @OneToMany(() => PersonRole, (personRole) => personRole.person)
   personRoles: PersonRole[];
+
+  @OneToMany(() => Fee, fee => fee.person)
+  fees: Fee[];
 }

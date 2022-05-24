@@ -69,7 +69,7 @@ export class PersonService {
 
   async findAll(): Promise<Person[]> {
     const listPerson = await this.personRepository.find({
-      relations: ['personRoles', 'personRoles.role'],
+      relations: ['personRoles', 'personRoles.role', 'user'],
     });
     return listPerson;
   }

@@ -8,6 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Invoice } from '../invoice/invoice.entity';
+import { Person } from '../person/person.entity';
 
 @Entity()
 export class Fee {
@@ -42,4 +43,7 @@ export class Fee {
 
   @ManyToOne(() => Invoice, (invoice) => invoice.fees, { nullable: false })
   invoice: Invoice;
+
+  @ManyToOne(() => Person, person => person.fees, { nullable: false })
+  person: Person;
 }
