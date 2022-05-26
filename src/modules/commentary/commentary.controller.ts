@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
 
 import { JwtAuthGuard } from '../../core/guards/jwt-auth.guard';
 import { Commentary } from './commentary.entity';
@@ -17,5 +17,15 @@ export class CommentaryController {
     @Get('project/:id')
     async findAllByProject(@Param('id') id: string): Promise<Commentary[]> {
         return await this.commentaryServices.findAllByProject(+id);
+    }
+
+    @Get('update/active/:id')
+    async updateActive(@Param('id') commentaryId: string): Promise<Commentary> {
+        return await this.commentaryServices.updateActive(+commentaryId);
+    }
+
+    @Put()
+    async update(@Body() commentary: Commentary): Promise<Commentary> {
+        return await this.commentaryServices.update(commentary);
     }
 }
