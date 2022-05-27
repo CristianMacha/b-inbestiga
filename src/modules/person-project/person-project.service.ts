@@ -2,6 +2,7 @@ import {
   BadGatewayException,
   BadRequestException,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 
 import { PersonProject } from './person-project.entity';
@@ -9,7 +10,7 @@ import { PersonProjectRepository } from './person-project.repository';
 
 @Injectable()
 export class PersonProjectService {
-  constructor(private personProjectRepository: PersonProjectRepository) {}
+  constructor(private personProjectRepository: PersonProjectRepository) { }
 
   async create(personProject: PersonProject): Promise<PersonProject> {
     try {
@@ -61,6 +62,31 @@ export class PersonProjectService {
       });
 
       return listPersonProject;
+    } catch (error) {
+      throw new BadGatewayException(error);
+    }
+  }
+
+  async updateActive(personProjectId: number): Promise<PersonProject> {
+    try {
+      const personProjectDb = await this.personProjectRepository.findOne(personProjectId);
+      if (!personProjectDb) { throw new NotFoundException('Person project not found.'); }
+
+      personProjectDb.active = !personProjectDb.active;
+      const personProjectUpdated = await this.personProjectRepository.save(personProjectDb);
+      return personProjectUpdated;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+
+  async update(personProject: PersonProject): Promise<PersonProject> {
+    try {
+      const personProjectDb = await this.personProjectRepository.preload(personProject);
+      if (!personProjectDb) { throw new NotFoundException('Person project not found.'); }
+
+      const personProjectUpdated = await this.personProjectRepository.save(personProjectDb);
+      return personProjectUpdated;
     } catch (error) {
       throw new BadGatewayException(error);
     }

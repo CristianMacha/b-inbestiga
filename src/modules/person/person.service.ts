@@ -20,7 +20,7 @@ export class PersonService {
     private bcryptServices: BcryptService,
     private nanoidServices: NanoidService,
     private roleServices: RoleService,
-  ) {}
+  ) { }
 
   async create(person: Person): Promise<Person> {
     try {
@@ -100,6 +100,31 @@ export class PersonService {
     try {
       const listPerson = await this.personRepository.findAllByRole(roleId);
       return listPerson;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+
+  async updateActive(personId: number): Promise<Person> {
+    try {
+      const personDb = await this.personRepository.findOne(personId);
+      if (!personDb) { throw new NotFoundException('Person not found'); }
+
+      personDb.active = !personDb.active;
+      const personUpdated = await this.personRepository.save(personDb);
+      return personUpdated;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+
+  async update(person: Person): Promise<Person> {
+    try {
+      const personDb = await this.personRepository.preload(person);
+      if(!personDb) { throw new NotFoundException('Person not found.'); }
+
+      const personUpdated = await this.personRepository.save(personDb);
+      return personUpdated;
     } catch (error) {
       throw new BadRequestException(error);
     }

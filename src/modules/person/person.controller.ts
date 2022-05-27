@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
 
 import { Person } from './person.entity';
 import { PersonService } from './person.service';
@@ -30,5 +30,15 @@ export class PersonController {
   @Get('role/:id')
   async findAllByRole(@Param('id') roleId: string): Promise<Person[]> {
     return await this.personServices.findAllByRole(+roleId);
+  }
+
+  @Get('update/active/:id')
+  async updateActive(@Param('id') personId: string): Promise<Person> {
+    return await this.personServices.updateActive(+personId);
+  }
+
+  @Put()
+  async update(@Body() person: Person): Promise<Person> {
+    return await this.personServices.update(person);
   }
 }

@@ -43,6 +43,19 @@ export class InvoiceService {
     }
   }
 
+  async updateActive(invoiceId: number): Promise<Invoice> {
+    try {
+      const invoiceDb = await this.invoiceRepository.findOne(invoiceId);
+      if(!invoiceDb) { throw new NotFoundException('Invoice not found.'); }
+
+      invoiceDb.active = !invoiceDb.active;
+      const invoiceUpdated = await this.invoiceRepository.save(invoiceDb);
+      return invoiceUpdated;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+
   async update(invoice: Invoice): Promise<Invoice> {
     try {
       const invoiceDb = await this.invoiceRepository.preload(invoice);

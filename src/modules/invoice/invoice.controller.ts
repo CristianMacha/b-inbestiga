@@ -22,6 +22,11 @@ export class InvoiceController {
     return await this.invoiceServices.findOne(+id);
   }
 
+  @Get('update/active/:id')
+  async updateActive(@Param('id') invoiceId: string): Promise<Invoice> {
+    return await this.invoiceServices.updateActive(+invoiceId);
+  }
+
   @Put()
   async update(@Body() invoice: Invoice): Promise<Invoice> {
     return await this.invoiceServices.update(invoice);

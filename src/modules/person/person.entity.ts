@@ -38,6 +38,9 @@ export class Person {
   @JoinColumn()
   user: User;
 
+  @Column({ nullable: false, default: true })
+  active: boolean;
+
   @OneToMany(() => PersonProject, (personProject) => personProject.person)
   personProjects: PersonProject[];
 
