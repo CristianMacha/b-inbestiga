@@ -33,6 +33,19 @@ export class PetitionService {
             throw new BadRequestException(error);
         }
     }
+
+    async updateActive(petitionId: number): Promise<Petition> {
+        try {
+            const petitionDb = await this.petitionRepository.findOne(petitionId);
+            if(!petitionDb) { throw new NotFoundException('Petition not found.'); }
+
+            petitionDb.active = !petitionDb.active;
+            const petitionUpdated = await this.petitionRepository.save(petitionDb);
+            return petitionUpdated;
+        } catch (error) {
+            throw new BadRequestException(error);
+        }
+    }
     
     async update(petition: Petition): Promise<Petition> {
         try {

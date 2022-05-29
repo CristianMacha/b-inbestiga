@@ -47,6 +47,11 @@ export class ProjectController {
     return await this.projectServices.findByPerson(+id);
   }
 
+  @Get('update/active/:id')
+  async updateActive(@Param('id') projectId: string): Promise<Project> {
+    return await this.projectServices.updateActive(+projectId);
+  }
+
   @Put()
   async update(@Body() project: Project): Promise<Project> {
     return await this.projectServices.update(project);

@@ -86,7 +86,7 @@ export class PersonService {
   async findOneByUser(userId: number): Promise<Person> {
     try {
       const personDb = await this.personRepository.findOne({
-        relations: ['personRoles', 'personRoles.role'],
+        relations: ['personRoles', 'personRoles.role', 'user'],
         where: { user: { id: userId } },
       });
 

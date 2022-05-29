@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
 import { Role } from './role.entity';
 import { RoleService } from './role.service';
 
@@ -14,5 +14,15 @@ export class RoleController {
   @Get()
   async findAll(): Promise<Role[]> {
     return await this.roleServices.findAll();
+  }
+
+  @Get('update/active/:id')
+  async updateActive(@Param('id') roleId: string): Promise<Role> {
+    return await this.roleServices.updateActive(+roleId);
+  }
+
+  @Put()
+  async update(@Body() role: Role): Promise<Role> {
+    return await this.roleServices.update(role);
   }
 }

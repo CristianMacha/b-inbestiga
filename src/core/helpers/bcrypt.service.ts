@@ -9,7 +9,7 @@ export class BcryptService {
     return passwordHash;
   }
 
-  async decrypt(
+  async compare(
     password: string | Buffer,
     passwordEncrypted: string,
   ): Promise<boolean> {

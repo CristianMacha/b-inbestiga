@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 
 import { Requirement } from './requirement.entity';
 import { RequirementRepository } from './requirement.repository';
@@ -42,6 +42,31 @@ export class RequirementService {
             });
 
             return listRequirement;
+        } catch (error) {
+            throw new BadRequestException(error);
+        }
+    }
+
+    async updateActive(requirementId: number): Promise<Requirement> {
+        try {
+            const requirementDb = await this.requirementRepository.findOne(requirementId);
+            if (!requirementDb) { throw new NotFoundException('Requirement not found.'); }
+
+            requirementDb.active = !requirementDb.active;
+            const requirementUpdate = await this.requirementRepository.save(requirementDb);
+            return requirementUpdate;
+        } catch (error) {
+            throw new BadRequestException(error);
+        }
+    }
+
+    async update(requirement: Requirement): Promise<Requirement> {
+        try {
+            const requirementDb = await this.requirementRepository.preload(requirement);
+            if (!requirementDb) { throw new NotFoundException('Requirement not found.'); }
+
+            const requirementUpdate = await this.requirementRepository.save(requirementDb);
+            return requirementUpdate;
         } catch (error) {
             throw new BadRequestException(error);
         }

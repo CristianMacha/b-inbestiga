@@ -21,7 +21,7 @@ export class AuthService {
       const userDb = await this.userServices.findByEmail(email);
       if (!userDb) throw new ForbiddenException();
 
-      const matchedPassword = await this.bcryptServices.decrypt(
+      const matchedPassword = await this.bcryptServices.compare(
         password,
         userDb.password,
       );

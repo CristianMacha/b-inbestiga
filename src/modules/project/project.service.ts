@@ -95,6 +95,19 @@ export class ProjectService {
         }
     }
 
+    async updateActive(projectId: number): Promise<Project> {
+        try {
+            const projectDb = await this.projectRepository.findOne(projectId);
+            if(!projectDb) { throw new NotFoundException('Project not found.'); }
+
+            projectDb.active = !projectDb.active;
+            const projectUpdate = await this.projectRepository.save(projectDb);
+            return projectUpdate;
+        } catch (error) {
+            throw new BadRequestException(error);
+        }
+    } 
+
     async update(project: Project): Promise<Project> {
         try {
             const projectDb = await this.projectRepository.preload(project);
