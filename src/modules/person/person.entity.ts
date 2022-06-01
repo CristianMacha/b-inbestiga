@@ -22,6 +22,9 @@ export class Person {
   @Column({ nullable: false })
   fullname: string;
 
+  @Column({ nullable: true })
+  surnames: string;
+
   @Column({ nullable: false })
   code: string;
 

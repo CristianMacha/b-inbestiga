@@ -22,11 +22,17 @@ export class Project {
   @Column({ nullable: false })
   name: string;
 
+  @Column({ nullable: true })
+  description: string;
+
   @Column({ nullable: false, default: true })
   inProgress: boolean;
 
   @Column({ nullable: false })
   status: string;
+
+  @Column({ nullable: true })
+  expirationDate: Date;
 
   @Column({ nullable: false, default: true })
   active: boolean;
