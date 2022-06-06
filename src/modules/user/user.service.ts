@@ -65,4 +65,17 @@ export class UserService {
       throw new BadRequestException(error);
     }
   }
+
+  async updateEmail(userId: number, newEmail: string): Promise<User> {
+    try {
+      const userDb = await this.userRepository.findOne(userId);
+      if (!userDb) { throw new NotFoundException('User not found.'); }
+
+      userDb.email = newEmail;
+      const userUpdated = await this.userRepository.save(userDb);
+      return userUpdated;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
 }

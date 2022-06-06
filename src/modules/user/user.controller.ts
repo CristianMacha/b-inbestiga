@@ -21,4 +21,9 @@ export class UserController {
     async findOne(@Param('id') userId: string): Promise<User> {
         return await this.userService.findOne(+userId)
     }
+
+    @Put('email/:id')
+    async updateEmail(@Param('id') userId: string, @Body() body: { email: string }): Promise<User> {
+        return await this.userService.updateEmail(+userId, body.email);
+    }
 }

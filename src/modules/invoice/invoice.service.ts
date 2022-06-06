@@ -11,6 +11,17 @@ import { InvoiceRepository } from './invoice.repository';
 export class InvoiceService {
   constructor(private invoiceRepository: InvoiceRepository) {}
 
+  async findOneByProject(projectId: number): Promise<Invoice> {
+    try {
+      const invoiceDb = await this.invoiceRepository.findOne({ where: { project: { id: projectId }}});
+      if(!invoiceDb) { throw new NotFoundException('Invoice not found.'); }
+
+      return invoiceDb;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+
   async create(invoice: Invoice): Promise<Invoice> {
     try {
       const newInvoice = this.invoiceRepository.create(invoice);

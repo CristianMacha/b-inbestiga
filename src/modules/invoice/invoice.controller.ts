@@ -5,7 +5,12 @@ import { InvoiceService } from './invoice.service';
 
 @Controller('invoice')
 export class InvoiceController {
-  constructor(private invoiceServices: InvoiceService) {}
+  constructor(private invoiceServices: InvoiceService) { }
+
+  @Get('project/:id')
+  async findOneByProject(@Param('id') projectId: string): Promise<Invoice> {
+    return await this.invoiceServices.findOneByProject(+projectId);
+  }
 
   @Post()
   async create(@Body() invoice: Invoice): Promise<Invoice> {
