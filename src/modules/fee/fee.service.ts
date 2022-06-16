@@ -68,4 +68,15 @@ export class FeeService {
       throw new BadRequestException(error);
     }
   }
+
+  async findByInvoice(invoiceId: number): Promise<Fee[]> {
+    try {
+      const listFee = await this.feeRepository.find({
+        where: { invoice: { id: invoiceId } }
+      });
+      return listFee;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
 }

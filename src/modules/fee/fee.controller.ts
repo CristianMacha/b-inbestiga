@@ -7,6 +7,11 @@ import { FeeService } from './fee.service';
 export class FeeController {
   constructor(private feeServices: FeeService) { }
 
+  @Get('invoice/:id')
+  async findByInvoice(@Param('id') invoiceId: string): Promise<Fee[]> {
+    return await this.feeServices.findByInvoice(+invoiceId);
+  }
+
   @Post()
   async create(@Body() fee: Fee): Promise<Fee> {
     return await this.feeServices.create(fee);

@@ -3,11 +3,13 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Category } from '../category/category.entity';
 import { Commentary } from '../commentary/commentary.entity';
 
 import { Invoice } from '../invoice/invoice.entity';
@@ -54,4 +56,7 @@ export class Project {
 
   @OneToMany(() => Commentary, (commentary) => commentary.project)
   commentaries: Commentary[];
+
+  @ManyToOne(() => Category, category => category.projects, { nullable: false })
+  category: Category;
 }

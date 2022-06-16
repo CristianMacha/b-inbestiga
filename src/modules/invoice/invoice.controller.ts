@@ -7,6 +7,11 @@ import { InvoiceService } from './invoice.service';
 export class InvoiceController {
   constructor(private invoiceServices: InvoiceService) { }
 
+  @Get('person/:id')
+  async findByPerson(@Param('id') personId: string): Promise<Invoice[]> {
+    return await this.invoiceServices.findByPerson(+personId);
+  }
+
   @Get('project/:id')
   async findOneByProject(@Param('id') projectId: string): Promise<Invoice> {
     return await this.invoiceServices.findOneByProject(+projectId);

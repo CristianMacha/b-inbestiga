@@ -10,6 +10,7 @@ import { InvoiceModule } from './invoice/invoice.module';
 import { FeeModule } from './fee/fee.module';
 import { CommentaryModule } from './commentary/commentary.module';
 import { PersonRoleModule } from './person-role/person-role.module';
+import { CategoryModule } from './category/category.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { PersonRoleModule } from './person-role/person-role.module';
     FeeModule,
     CommentaryModule,
     PersonRoleModule,
+    CategoryModule,
   ],
   exports: [
     RoleModule,

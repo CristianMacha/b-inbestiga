@@ -38,6 +38,9 @@ export class Invoice {
   @Column({ nullable: false, default: true })
   active: boolean;
 
+  @Column()
+  expirationDate: Date;
+
   @CreateDateColumn()
   createdAt: Date;
 

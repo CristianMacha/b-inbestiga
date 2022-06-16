@@ -43,9 +43,7 @@ export class PersonService {
           newUser.password = passwordHashed;
           const newUserCreated = await manager.save(newUser);
 
-          const newPerson = new Person();
-          newPerson.fullname = person.fullname;
-          newPerson.phone = person.phone;
+          const newPerson = this.personRepository.create(person);
           newPerson.code = userCode;
           newPerson.user = newUserCreated;
           const newPersonCreated = await manager.save(newPerson);
