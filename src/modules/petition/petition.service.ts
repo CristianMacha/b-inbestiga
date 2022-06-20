@@ -18,7 +18,10 @@ export class PetitionService {
 
     async findAll(): Promise<Petition[]> {
         try {
-            const listPetition = await this.petitionRepository.find({ where: { active: true } });
+            const listPetition = await this.petitionRepository.find({
+                relations: ['category'],
+                where: { active: true },
+             });
             return listPetition;
         } catch (error) {
             throw new BadRequestException(error);
@@ -27,7 +30,9 @@ export class PetitionService {
 
     async findOne(petitionId: number): Promise<Petition> {
         try {
-            const petitionDb = await this.petitionRepository.findOne(petitionId);
+            const petitionDb = await this.petitionRepository.findOne(petitionId, {
+                relations: ['category']
+            });
             return petitionDb;
         } catch (error) {
             throw new BadRequestException(error);

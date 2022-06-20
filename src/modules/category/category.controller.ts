@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { Category } from './category.entity';
 import { CategoryService } from './category.service';
 
@@ -9,5 +9,10 @@ export class CategoryController {
     @Post()
     async create(@Body() category: Category): Promise<Category> {
         return await this.categoryService.create(category);
+    }
+
+    @Get()
+    async findAll(): Promise<Category[]> {
+        return await this.categoryService.findAll();
     }
 }

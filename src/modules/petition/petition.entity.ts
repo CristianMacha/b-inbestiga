@@ -2,9 +2,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Category } from '../category/category.entity';
 import { EPetitionStatus } from './enum/petition-status.enum';
 
 @Entity()
@@ -14,6 +16,9 @@ export class Petition {
 
   @Column()
   name: string;
+
+  @Column()
+  surnames: string;
 
   @Column()
   email: string;
@@ -35,9 +40,6 @@ export class Petition {
   url: string;
 
   @Column()
-  category: string;
-
-  @Column()
   message: string;
 
   @Column({ default: true })
@@ -51,4 +53,7 @@ export class Petition {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @ManyToOne(() => Category, category => category.petitions)
+  category: Category;
 }
