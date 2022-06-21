@@ -29,6 +29,7 @@ export class ProjectService {
                     const newInvoice = new Invoice();
                     newInvoice.total = invoice.total;
                     newInvoice.description = invoice.description;
+                    newInvoice.expirationDate = invoice.expirationDate;
                     newInvoice.project = newProjectCreated;
                     await manager.save(newInvoice);
                 }
