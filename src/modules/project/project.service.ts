@@ -68,7 +68,7 @@ export class ProjectService {
         try {
             const listProject = await this.projectRepository.find({ 
                 relations: ['personProjects', 'personProjects.person'],
-                where: { active: true }
+                where: { deleted: false }
              });
             return listProject;
         } catch (error) {

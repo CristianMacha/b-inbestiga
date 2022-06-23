@@ -8,7 +8,7 @@ export class ProjectRepository extends Repository<Project> {
             .innerJoinAndSelect('project.personProjects', 'personProject')
             .innerJoinAndSelect('personProject.person', 'person')
             .where('person.id=:personId', { personId })
-            .andWhere('project.active=true')
+            .andWhere('project.deleted=false')
 
         const result = await query.getMany();
         return result;
