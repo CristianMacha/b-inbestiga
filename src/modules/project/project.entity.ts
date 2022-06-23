@@ -27,6 +27,9 @@ export class Project {
   @Column({ nullable: true })
   description: string;
 
+  @Column()
+  progress: number;
+
   @Column({ nullable: false, default: true })
   inProgress: boolean;
 

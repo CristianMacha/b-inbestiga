@@ -15,4 +15,13 @@ export class CategoryService {
             throw new BadRequestException(error);
         }
     }
+
+    async findAll(): Promise<Category[]> {
+        try {
+            const listCategory = await this.categoryRepository.find({ where: { active: true }});
+            return listCategory;
+        } catch (error) {
+            throw new BadRequestException(error);
+        }
+    }
 }

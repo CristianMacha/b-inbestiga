@@ -1,4 +1,5 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Petition } from "../petition/petition.entity";
 import { Project } from "../project/project.entity";
 
 @Entity()
@@ -20,4 +21,7 @@ export class Category {
 
     @OneToMany(() => Project, project => project.category)
     projects: Project[];
+
+    @OneToMany(() => Petition, petition => petition.category)
+    petitions: Petition[];
 }

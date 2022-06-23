@@ -2,8 +2,10 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { User } from '../modules/user/user.entity';
 
 import { BcryptService } from '../core/helpers/bcrypt.service';
 import { UserService } from '../modules/user/user.service';
@@ -28,14 +30,33 @@ export class AuthService {
 
       if (!matchedPassword) throw new ForbiddenException();
 
-      const token = await this.jwtServices.signAsync({
-        email: userDb.email,
-        userId: userDb.id,
-      });
+      const token = await this.generateJwt(userDb.email, userDb.id);
 
       return { token, userDb };
     } catch (error) {
       throw new BadRequestException(error);
+    }
+  }
+
+  async refreshToken(userAuth: User) {
+    try {
+      const userDb = await this.userServices.findOne(userAuth.id);
+      if(!userDb) { throw new NotFoundException('User not found.'); }
+
+      const token = await this.generateJwt(userDb.email, userDb.id);
+
+      return { token, userDb };
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+
+  private async generateJwt(email: string, userId: number) {
+    try {
+      const token = await this.jwtServices.signAsync({email, userId});
+      return token;
+    } catch (error) {
+      throw new ForbiddenException('Token error generate.');
     }
   }
 }
