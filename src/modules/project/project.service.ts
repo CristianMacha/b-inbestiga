@@ -78,7 +78,7 @@ export class ProjectService {
     async findOne(projectId: number): Promise<Project> {
         try {
             const projectDb = await this.projectRepository.findOne(projectId, {
-                relations: ['personProjects', 'personProjects.person'],
+                relations: ['personProjects', 'personProjects.person', 'category'],
             });
             return projectDb;
         } catch (error) {

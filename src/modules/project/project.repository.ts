@@ -5,8 +5,8 @@ import { Project } from "./project.entity";
 export class ProjectRepository extends Repository<Project> {
     async findByPerson(personId: number): Promise<Project[]> {
         const query = this.createQueryBuilder('project')
-            .innerJoin('project.personProjects', 'personProject')
-            .innerJoin('personProject.person', 'person')
+            .innerJoinAndSelect('project.personProjects', 'personProject')
+            .innerJoinAndSelect('personProject.person', 'person')
             .where('person.id=:personId', { personId })
             .andWhere('project.active=true')
 
