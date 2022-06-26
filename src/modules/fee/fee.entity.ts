@@ -35,6 +35,9 @@ export class Fee {
   @Column({ nullable: false, default: true })
   active: boolean;
 
+  @Column()
+  paymentMethod: string;
+
   @CreateDateColumn()
   createdAt: Date;
 

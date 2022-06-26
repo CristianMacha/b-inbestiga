@@ -72,6 +72,7 @@ export class FeeService {
   async findByInvoice(invoiceId: number): Promise<Fee[]> {
     try {
       const listFee = await this.feeRepository.find({
+        relations: ['person'],
         where: { invoice: { id: invoiceId } }
       });
       return listFee;
