@@ -54,7 +54,7 @@ export class Project {
   @OneToMany(() => PersonProject, (personProject) => personProject.project)
   personProjects: PersonProject[];
 
-  @OneToMany(() => Requirement, (requirement) => requirement)
+  @OneToMany(() => Requirement, (requirement) => requirement.project)
   requirements: Requirement[];
 
   @OneToMany(() => Invoice, (invoice) => invoice.project)
