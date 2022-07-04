@@ -7,7 +7,7 @@ export const AuthProvider: DynamicModule = JwtModule.registerAsync({
   async useFactory(config: ConfigService) {
     const register: JwtModuleOptions = {
       secret: config.get('JWT_SECRET'),
-      signOptions: { expiresIn: 18000 },
+      signOptions: { expiresIn: '1d' },
     };
 
     return register;

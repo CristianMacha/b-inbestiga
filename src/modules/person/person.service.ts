@@ -12,6 +12,7 @@ import { Person } from './person.entity';
 import { RoleService } from '../role/role.service';
 import { User } from '../user/user.entity';
 import { PersonRole } from '../person-role/person-role.entity';
+import { PersonRoleService } from '../person-role/person-role.service';
 
 @Injectable()
 export class PersonService {
@@ -20,6 +21,7 @@ export class PersonService {
     private bcryptServices: BcryptService,
     private nanoidServices: NanoidService,
     private roleServices: RoleService,
+    private personRoleService: PersonRoleService,
   ) { }
 
   async create(person: Person): Promise<Person> {
@@ -121,7 +123,17 @@ export class PersonService {
       const personDb = await this.personRepository.preload(person);
       if(!personDb) { throw new NotFoundException('Person not found.'); }
 
-      const personUpdated = await this.personRepository.save(personDb);
+      const personRoleDb = await this.personRoleService.findOne(person.personRoles[0].id);
+      if(!personRoleDb) { throw new NotFoundException('Person role not found.'); }
+      personRoleDb.role = person.personRoles[0].role;
+
+      const connection = getConnection();
+      const personUpdated = await connection.transaction('SERIALIZABLE', async manager => {
+        const updatePerson = await manager.save(personDb);
+        await manager.save(personRoleDb);
+        return updatePerson;
+      });
+
       return personUpdated;
     } catch (error) {
       throw new BadRequestException(error);

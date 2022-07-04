@@ -9,6 +9,7 @@ import { User } from '../modules/user/user.entity';
 
 import { BcryptService } from '../core/helpers/bcrypt.service';
 import { UserService } from '../modules/user/user.service';
+import { Person } from 'src/modules/person/person.entity';
 
 @Injectable()
 export class AuthService {
@@ -38,9 +39,9 @@ export class AuthService {
     }
   }
 
-  async refreshToken(userAuth: User) {
+  async refreshToken(personAuth: Person) {
     try {
-      const userDb = await this.userServices.findOne(userAuth.id);
+      const userDb = await this.userServices.findOne(personAuth.user.id);
       if(!userDb) { throw new NotFoundException('User not found.'); }
 
       const token = await this.generateJwt(userDb.email, userDb.id);
