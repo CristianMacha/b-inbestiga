@@ -121,10 +121,10 @@ export class PersonService {
   async update(person: Person): Promise<Person> {
     try {
       const personDb = await this.personRepository.preload(person);
-      if(!personDb) { throw new NotFoundException('Person not found.'); }
+      if (!personDb) { throw new NotFoundException('Person not found.'); }
 
       const personRoleDb = await this.personRoleService.findOne(person.personRoles[0].id);
-      if(!personRoleDb) { throw new NotFoundException('Person role not found.'); }
+      if (!personRoleDb) { throw new NotFoundException('Person role not found.'); }
       personRoleDb.role = person.personRoles[0].role;
 
       const connection = getConnection();
@@ -134,7 +134,11 @@ export class PersonService {
         return updatePerson;
       });
 
-      return personUpdated;
+      const personUpdatedDb = await this.personRepository.findOne(personUpdated.id, {
+        relations: ['personRoles', 'personRoles.role', 'user'],
+      });
+
+      return personUpdatedDb;
     } catch (error) {
       throw new BadRequestException(error);
     }

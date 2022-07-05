@@ -15,7 +15,7 @@ export class PersonRole {
   id: number;
 
   @Column({ nullable: false, default: true })
-  aactive: boolean;
+  active: boolean;
 
   @CreateDateColumn()
   createdAt: Date;
