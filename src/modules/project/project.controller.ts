@@ -20,11 +20,8 @@ export class ProjectController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  async create(
-    @Body() data: { project: Project; person: Person, asesor: Person },
-    @Req() req,
-  ): Promise<Project> {
-    return await this.projectServices.create(data.project);
+  async create(@Body() project: Project): Promise<Project> {
+    return await this.projectServices.create(project);
   }
 
   @Get()

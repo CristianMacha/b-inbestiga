@@ -45,8 +45,6 @@ export class ProjectService {
 
             return projectCreated;
         } catch (error) {
-            console.log(error);
-            
             throw new BadRequestException(error);
         }
     }
