@@ -143,4 +143,13 @@ export class PersonService {
       throw new BadRequestException(error);
     }
   }
+
+  async findByCodeAndRole(code: string, roleId: number): Promise<Person> {
+    try {
+      const personDb = await this.personRepository.findByCodeAndRole(code, roleId);
+      return personDb;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
 }

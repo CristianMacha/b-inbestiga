@@ -24,12 +24,7 @@ export class ProjectController {
     @Body() data: { project: Project; person: Person, asesor: Person },
     @Req() req,
   ): Promise<Project> {
-    return await this.projectServices.create(
-      data.project,
-      data.person,
-      req.user,
-      data.asesor
-    );
+    return await this.projectServices.create(data.project);
   }
 
   @Get()

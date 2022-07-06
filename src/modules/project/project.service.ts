@@ -15,15 +15,12 @@ export class ProjectService {
         private personService: PersonService,
     ) { }
 
-    async create(project: Project, person: Person, authUser: Person, asesor: Person): Promise<Project> {        
+    async create(project: Project): Promise<Project> {
         try {
             const connection = getConnection();
             const projectCreated = await connection.transaction('SERIALIZABLE', async manager => {
-                const personDb = await this.personService.findOne(person.id);
-                if (!personDb) throw new NotFoundException('Person not found.');
-                
                 const newProject = this.projectRepository.create(project);
-                const newProjectCreated = await manager.save(newProject);
+                const newProjectCreated = await this.projectRepository.save(newProject);
 
                 for await (const invoice of project.invoices) {
                     const newInvoice = new Invoice();
@@ -33,36 +30,75 @@ export class ProjectService {
                     newInvoice.project = newProjectCreated;
                     await manager.save(newInvoice);
                 }
-                
-                // Asignar estudiante
-                const newPersonProject = new PersonProject();
-                newPersonProject.person = personDb;
-                newPersonProject.project = newProjectCreated;
-                await manager.save(newPersonProject);
 
-                // Asignar asesor
-                const asesorDb = await this.personService.findOne(asesor.id);
-                if(asesorDb) {
-                    const newAdvisor = new PersonProject();
-                    newAdvisor.person = asesorDb;
-                    newAdvisor.project = newProjectCreated;
-                    newAdvisor.isAdvisor = true;
-                    await manager.save(newAdvisor);
-                } else {
-                    const newAdvisor = new PersonProject();
-                    newAdvisor.person = authUser;
-                    newAdvisor.project = newProjectCreated;
-                    newAdvisor.isAdvisor = true;
-                    await manager.save(newAdvisor);
+                for await (const personProject of project.personProjects) {
+                    const newMember = new PersonProject();
+                    newMember.person = personProject.person;
+                    newMember.project = newProjectCreated;
+                    newMember.isAdvisor = personProject.isAdvisor;
+
+                    await manager.save(newMember);
                 }
 
                 return newProjectCreated;
             });
+
             return projectCreated;
         } catch (error) {
+            console.log(error);
+            
             throw new BadRequestException(error);
         }
     }
+
+    // async create(project: Project, person: Person, authUser: Person, asesor: Person): Promise<Project> {        
+    //     try {
+    //         const connection = getConnection();
+    //         const projectCreated = await connection.transaction('SERIALIZABLE', async manager => {
+    //             const personDb = await this.personService.findOne(person.id);
+    //             if (!personDb) throw new NotFoundException('Person not found.');
+                
+    //             const newProject = this.projectRepository.create(project);
+    //             const newProjectCreated = await manager.save(newProject);
+
+    //             for await (const invoice of project.invoices) {
+    //                 const newInvoice = new Invoice();
+    //                 newInvoice.total = invoice.total;
+    //                 newInvoice.description = invoice.description;
+    //                 newInvoice.expirationDate = invoice.expirationDate;
+    //                 newInvoice.project = newProjectCreated;
+    //                 await manager.save(newInvoice);
+    //             }
+                
+    //             // Asignar estudiante
+    //             const newPersonProject = new PersonProject();
+    //             newPersonProject.person = personDb;
+    //             newPersonProject.project = newProjectCreated;
+    //             await manager.save(newPersonProject);
+
+    //             // Asignar asesor
+    //             const asesorDb = await this.personService.findOne(asesor.id);
+    //             if(asesorDb) {
+    //                 const newAdvisor = new PersonProject();
+    //                 newAdvisor.person = asesorDb;
+    //                 newAdvisor.project = newProjectCreated;
+    //                 newAdvisor.isAdvisor = true;
+    //                 await manager.save(newAdvisor);
+    //             } else {
+    //                 const newAdvisor = new PersonProject();
+    //                 newAdvisor.person = authUser;
+    //                 newAdvisor.project = newProjectCreated;
+    //                 newAdvisor.isAdvisor = true;
+    //                 await manager.save(newAdvisor);
+    //             }
+
+    //             return newProjectCreated;
+    //         });
+    //         return projectCreated;
+    //     } catch (error) {
+    //         throw new BadRequestException(error);
+    //     }
+    // }
 
     async findAll(): Promise<Project[]> {
         try {

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 
 import { Person } from './person.entity';
 import { PersonService } from './person.service';
@@ -40,5 +40,10 @@ export class PersonController {
   @Put()
   async update(@Body() person: Person): Promise<Person> {
     return await this.personServices.update(person);
+  }
+
+  @Get('find/members')
+  async findByCodeAndRole(@Query() query: { code: string, roleId: number }) {
+    return await this.personServices.findByCodeAndRole(query.code, query.roleId);
   }
 }
