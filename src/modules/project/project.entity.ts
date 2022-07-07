@@ -36,7 +36,7 @@ export class Project {
   @Column({ nullable: false })
   status: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'date', nullable: true })
   expirationDate: Date;
 
   @Column({ nullable: false, default: true })
