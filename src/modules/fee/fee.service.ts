@@ -10,7 +10,7 @@ import { FeeRepository } from './fee.repository';
 
 @Injectable()
 export class FeeService {
-  constructor(private feeRepository: FeeRepository) { }
+  constructor(private feeRepository: FeeRepository) {}
 
   async create(fee: Fee): Promise<Fee> {
     try {
@@ -25,7 +25,7 @@ export class FeeService {
   async findAll(): Promise<Fee[]> {
     try {
       const listFee = await this.feeRepository.find({
-        relations: ['person']
+        relations: ['person'],
       });
       return listFee;
     } catch (error) {
@@ -36,7 +36,7 @@ export class FeeService {
   async findOne(feeId: number): Promise<Fee> {
     try {
       const feeDb = await this.feeRepository.findOne(feeId, {
-        relations: ['person']
+        relations: ['person'],
       });
       return feeDb;
     } catch (error) {
@@ -47,7 +47,9 @@ export class FeeService {
   async updateActive(feeId: number): Promise<Fee> {
     try {
       const feeDb = await this.feeRepository.findOne(feeId);
-      if (!feeDb) { throw new NotFoundException('Fee not found.'); }
+      if (!feeDb) {
+        throw new NotFoundException('Fee not found.');
+      }
 
       feeDb.active = !feeDb.active;
       const feeUpdated = await this.feeRepository.save(feeDb);
@@ -60,7 +62,9 @@ export class FeeService {
   async update(fee: Fee): Promise<Fee> {
     try {
       const feeDb = await this.feeRepository.preload(fee);
-      if (!feeDb) { throw new NotFoundException('Fee not found.'); }
+      if (!feeDb) {
+        throw new NotFoundException('Fee not found.');
+      }
 
       const feeUpdated = await this.feeRepository.save(feeDb);
       return feeUpdated;
@@ -73,7 +77,7 @@ export class FeeService {
     try {
       const listFee = await this.feeRepository.find({
         relations: ['person'],
-        where: { invoice: { id: invoiceId } }
+        where: { invoice: { id: invoiceId } },
       });
       return listFee;
     } catch (error) {

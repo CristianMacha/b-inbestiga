@@ -5,7 +5,7 @@ import { FeeService } from './fee.service';
 
 @Controller('fee')
 export class FeeController {
-  constructor(private feeServices: FeeService) { }
+  constructor(private feeServices: FeeService) {}
 
   @Get('invoice/:id')
   async findByInvoice(@Param('id') invoiceId: string): Promise<Fee[]> {

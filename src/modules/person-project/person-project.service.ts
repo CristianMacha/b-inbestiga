@@ -10,7 +10,7 @@ import { PersonProjectRepository } from './person-project.repository';
 
 @Injectable()
 export class PersonProjectService {
-  constructor(private personProjectRepository: PersonProjectRepository) { }
+  constructor(private personProjectRepository: PersonProjectRepository) {}
 
   async create(personProject: PersonProject): Promise<PersonProject> {
     try {
@@ -69,11 +69,17 @@ export class PersonProjectService {
 
   async updateActive(personProjectId: number): Promise<PersonProject> {
     try {
-      const personProjectDb = await this.personProjectRepository.findOne(personProjectId);
-      if (!personProjectDb) { throw new NotFoundException('Person project not found.'); }
+      const personProjectDb = await this.personProjectRepository.findOne(
+        personProjectId,
+      );
+      if (!personProjectDb) {
+        throw new NotFoundException('Person project not found.');
+      }
 
       personProjectDb.active = !personProjectDb.active;
-      const personProjectUpdated = await this.personProjectRepository.save(personProjectDb);
+      const personProjectUpdated = await this.personProjectRepository.save(
+        personProjectDb,
+      );
       return personProjectUpdated;
     } catch (error) {
       throw new BadRequestException(error);
@@ -82,10 +88,16 @@ export class PersonProjectService {
 
   async update(personProject: PersonProject): Promise<PersonProject> {
     try {
-      const personProjectDb = await this.personProjectRepository.preload(personProject);
-      if (!personProjectDb) { throw new NotFoundException('Person project not found.'); }
+      const personProjectDb = await this.personProjectRepository.preload(
+        personProject,
+      );
+      if (!personProjectDb) {
+        throw new NotFoundException('Person project not found.');
+      }
 
-      const personProjectUpdated = await this.personProjectRepository.save(personProjectDb);
+      const personProjectUpdated = await this.personProjectRepository.save(
+        personProjectDb,
+      );
       return personProjectUpdated;
     } catch (error) {
       throw new BadGatewayException(error);

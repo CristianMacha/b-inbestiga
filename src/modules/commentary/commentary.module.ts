@@ -8,6 +8,6 @@ import { CommentaryService } from './commentary.service';
 @Module({
   imports: [TypeOrmModule.forFeature([CommentaryRepository])],
   controllers: [CommentaryController],
-  providers: [CommentaryService]
+  providers: [CommentaryService],
 })
-export class CommentaryModule { }
+export class CommentaryModule {}

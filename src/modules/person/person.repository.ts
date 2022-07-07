@@ -19,7 +19,7 @@ export class PersonRepository extends Repository<Person> {
       .innerJoin('person.personRoles', 'personRole')
       .innerJoin('personRole.role', 'role')
       .where('person.code=:code', { code })
-      .andWhere('role.id=:roleId', { roleId })
+      .andWhere('role.id=:roleId', { roleId });
 
     const result = await query.getOne();
     return result;

@@ -4,25 +4,25 @@ import { CategoryService } from './category.service';
 
 @Controller('category')
 export class CategoryController {
-    constructor(private categoryService: CategoryService) { }
+  constructor(private categoryService: CategoryService) {}
 
-    @Post()
-    async create(@Body() category: Category): Promise<Category> {
-        return await this.categoryService.create(category);
-    }
+  @Post()
+  async create(@Body() category: Category): Promise<Category> {
+    return await this.categoryService.create(category);
+  }
 
-    @Get()
-    async findAll(): Promise<Category[]> {
-        return await this.categoryService.findAll();
-    }
+  @Get()
+  async findAll(): Promise<Category[]> {
+    return await this.categoryService.findAll();
+  }
 
-    @Get('update/active/:id')
-    async updateActive(@Param('id') categoryId: string): Promise<Category> {
-        return await this.categoryService.updateActive(+categoryId);
-    }
+  @Get('update/active/:id')
+  async updateActive(@Param('id') categoryId: string): Promise<Category> {
+    return await this.categoryService.updateActive(+categoryId);
+  }
 
-    @Put()
-    async update(@Body() category: Category): Promise<Category> {
-        return await this.categoryService.update(category);
-    }
+  @Put()
+  async update(@Body() category: Category): Promise<Category> {
+    return await this.categoryService.update(category);
+  }
 }

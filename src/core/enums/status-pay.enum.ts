@@ -1,4 +1,4 @@
 export enum EStatusPay {
-    PENDING='PENDIENTE',
-    PAID_OUT='PAGADO',
+  PENDING = 'PENDIENTE',
+  PAID_OUT = 'PAGADO',
 }

@@ -5,7 +5,7 @@ import { PetitionService } from './petition.service';
 
 @Controller('petition')
 export class PetitionController {
-  constructor(private petitionServices: PetitionService) { }
+  constructor(private petitionServices: PetitionService) {}
 
   @Post()
   async create(@Body() petition: Petition): Promise<Petition> {

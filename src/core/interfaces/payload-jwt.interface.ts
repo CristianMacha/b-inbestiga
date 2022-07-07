@@ -1,4 +1,4 @@
 export interface IPayloadJwt {
-    email: string,
-    userId: number,
+  email: string;
+  userId: number;
 }

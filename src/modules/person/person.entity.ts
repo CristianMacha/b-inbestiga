@@ -53,6 +53,6 @@ export class Person {
   @OneToMany(() => PersonRole, (personRole) => personRole.person)
   personRoles: PersonRole[];
 
-  @OneToMany(() => Fee, fee => fee.person)
+  @OneToMany(() => Fee, (fee) => fee.person)
   fees: Fee[];
 }

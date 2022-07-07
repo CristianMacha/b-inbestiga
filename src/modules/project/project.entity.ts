@@ -63,6 +63,8 @@ export class Project {
   @OneToMany(() => Commentary, (commentary) => commentary.project)
   commentaries: Commentary[];
 
-  @ManyToOne(() => Category, category => category.projects, { nullable: false })
+  @ManyToOne(() => Category, (category) => category.projects, {
+    nullable: false,
+  })
   category: Category;
 }

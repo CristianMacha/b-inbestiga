@@ -54,6 +54,6 @@ export class Petition {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToOne(() => Category, category => category.petitions)
+  @ManyToOne(() => Category, (category) => category.petitions)
   category: Category;
 }

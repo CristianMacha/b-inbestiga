@@ -7,10 +7,7 @@ import { UserRepository } from './user.repository';
 import { UserService } from './user.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([UserRepository]),
-    CoreModule
-  ],
+  imports: [TypeOrmModule.forFeature([UserRepository]), CoreModule],
   controllers: [UserController],
   providers: [UserService],
   exports: [UserService],

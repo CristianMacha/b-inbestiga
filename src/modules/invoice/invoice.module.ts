@@ -9,5 +9,6 @@ import { InvoiceService } from './invoice.service';
   imports: [TypeOrmModule.forFeature([InvoiceRepository])],
   controllers: [InvoiceController],
   providers: [InvoiceService],
+  exports: [InvoiceService],
 })
 export class InvoiceModule {}

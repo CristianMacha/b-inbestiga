@@ -8,7 +8,6 @@ import { RequirementService } from './requirement.service';
 @Module({
   imports: [TypeOrmModule.forFeature([RequirementRepository])],
   controllers: [RequirementController],
-  providers: [RequirementService]
+  providers: [RequirementService],
 })
-export class RequirementModule { }
-
+export class RequirementModule {}

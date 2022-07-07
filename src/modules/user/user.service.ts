@@ -1,4 +1,9 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { BcryptService } from '../../core/helpers/bcrypt.service';
 import { User } from './user.entity';
@@ -9,7 +14,7 @@ export class UserService {
   constructor(
     private userRepository: UserRepository,
     private bcryptService: BcryptService,
-  ) { }
+  ) {}
 
   async findOneByEmail(email: string, roleId: number): Promise<User> {
     const userDb = await this.userRepository.findOne({
@@ -39,7 +44,9 @@ export class UserService {
   async updateActive(userId: number): Promise<User> {
     try {
       const userDb = await this.userRepository.findOne(userId);
-      if (!userDb) { throw new NotFoundException('User not found.'); }
+      if (!userDb) {
+        throw new NotFoundException('User not found.');
+      }
 
       userDb.active = !userDb.active;
       const userUpdate = await this.userRepository.save(userDb);
@@ -49,15 +56,28 @@ export class UserService {
     }
   }
 
-  async updatePassword(password: string, newPassword: string, userId: number): Promise<User> {
+  async updatePassword(
+    password: string,
+    newPassword: string,
+    userId: number,
+  ): Promise<User> {
     try {
       const userDb = await this.userRepository.findOne(userId);
-      if (!userDb) { throw new NotFoundException('User not found.'); }
+      if (!userDb) {
+        throw new NotFoundException('User not found.');
+      }
 
-      const passwordHashed = await this.bcryptService.compare(password, userDb.password);
-      if (!passwordHashed) { throw new ForbiddenException(); }
+      const passwordHashed = await this.bcryptService.compare(
+        password,
+        userDb.password,
+      );
+      if (!passwordHashed) {
+        throw new ForbiddenException();
+      }
 
-      const newPasswordHashed = await this.bcryptService.encryptPassword(newPassword);
+      const newPasswordHashed = await this.bcryptService.encryptPassword(
+        newPassword,
+      );
       userDb.password = newPasswordHashed;
       const userUpdate = await this.userRepository.save(userDb);
       return userUpdate;
@@ -69,7 +89,9 @@ export class UserService {
   async updateEmail(userId: number, newEmail: string): Promise<User> {
     try {
       const userDb = await this.userRepository.findOne(userId);
-      if (!userDb) { throw new NotFoundException('User not found.'); }
+      if (!userDb) {
+        throw new NotFoundException('User not found.');
+      }
 
       userDb.email = newEmail;
       const userUpdated = await this.userRepository.save(userDb);

@@ -22,7 +22,7 @@ export class PersonService {
     private nanoidServices: NanoidService,
     private roleServices: RoleService,
     private personRoleService: PersonRoleService,
-  ) { }
+  ) {}
 
   async create(person: Person): Promise<Person> {
     try {
@@ -108,7 +108,9 @@ export class PersonService {
   async updateActive(personId: number): Promise<Person> {
     try {
       const personDb = await this.personRepository.findOne(personId);
-      if (!personDb) { throw new NotFoundException('Person not found'); }
+      if (!personDb) {
+        throw new NotFoundException('Person not found');
+      }
 
       personDb.active = !personDb.active;
       const personUpdated = await this.personRepository.save(personDb);
@@ -121,22 +123,34 @@ export class PersonService {
   async update(person: Person): Promise<Person> {
     try {
       const personDb = await this.personRepository.preload(person);
-      if (!personDb) { throw new NotFoundException('Person not found.'); }
+      if (!personDb) {
+        throw new NotFoundException('Person not found.');
+      }
 
-      const personRoleDb = await this.personRoleService.findOne(person.personRoles[0].id);
-      if (!personRoleDb) { throw new NotFoundException('Person role not found.'); }
+      const personRoleDb = await this.personRoleService.findOne(
+        person.personRoles[0].id,
+      );
+      if (!personRoleDb) {
+        throw new NotFoundException('Person role not found.');
+      }
       personRoleDb.role = person.personRoles[0].role;
 
       const connection = getConnection();
-      const personUpdated = await connection.transaction('SERIALIZABLE', async manager => {
-        const updatePerson = await manager.save(personDb);
-        await manager.save(personRoleDb);
-        return updatePerson;
-      });
+      const personUpdated = await connection.transaction(
+        'SERIALIZABLE',
+        async (manager) => {
+          const updatePerson = await manager.save(personDb);
+          await manager.save(personRoleDb);
+          return updatePerson;
+        },
+      );
 
-      const personUpdatedDb = await this.personRepository.findOne(personUpdated.id, {
-        relations: ['personRoles', 'personRoles.role', 'user'],
-      });
+      const personUpdatedDb = await this.personRepository.findOne(
+        personUpdated.id,
+        {
+          relations: ['personRoles', 'personRoles.role', 'user'],
+        },
+      );
 
       return personUpdatedDb;
     } catch (error) {
@@ -146,7 +160,10 @@ export class PersonService {
 
   async findByCodeAndRole(code: string, roleId: number): Promise<Person> {
     try {
-      const personDb = await this.personRepository.findByCodeAndRole(code, roleId);
+      const personDb = await this.personRepository.findByCodeAndRole(
+        code,
+        roleId,
+      );
       return personDb;
     } catch (error) {
       throw new BadRequestException(error);

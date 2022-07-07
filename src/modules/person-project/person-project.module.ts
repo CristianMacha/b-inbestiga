@@ -6,10 +6,9 @@ import { PersonProjectRepository } from './person-project.repository';
 import { PersonProjectService } from './person-project.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([PersonProjectRepository])
-  ],
+  imports: [TypeOrmModule.forFeature([PersonProjectRepository])],
   controllers: [PersonProjectController],
-  providers: [PersonProjectService]
+  providers: [PersonProjectService],
+  exports: [PersonProjectService],
 })
-export class PersonProjectModule { }
+export class PersonProjectModule {}

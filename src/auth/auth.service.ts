@@ -17,7 +17,7 @@ export class AuthService {
     private userServices: UserService,
     private bcryptServices: BcryptService,
     private jwtServices: JwtService,
-  ) { }
+  ) {}
 
   async signin(email: string, password: string) {
     try {
@@ -42,7 +42,9 @@ export class AuthService {
   async refreshToken(personAuth: Person) {
     try {
       const userDb = await this.userServices.findOne(personAuth.user.id);
-      if(!userDb) { throw new NotFoundException('User not found.'); }
+      if (!userDb) {
+        throw new NotFoundException('User not found.');
+      }
 
       const token = await this.generateJwt(userDb.email, userDb.id);
 
@@ -54,7 +56,7 @@ export class AuthService {
 
   private async generateJwt(email: string, userId: number) {
     try {
-      const token = await this.jwtServices.signAsync({email, userId});
+      const token = await this.jwtServices.signAsync({ email, userId });
       return token;
     } catch (error) {
       throw new ForbiddenException('Token error generate.');

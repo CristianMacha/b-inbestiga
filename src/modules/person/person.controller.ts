@@ -5,7 +5,7 @@ import { PersonService } from './person.service';
 
 @Controller('person')
 export class PersonController {
-  constructor(private personServices: PersonService) { }
+  constructor(private personServices: PersonService) {}
 
   @Post()
   async create(@Body() person: Person): Promise<Person> {
@@ -43,7 +43,10 @@ export class PersonController {
   }
 
   @Get('find/members')
-  async findByCodeAndRole(@Query() query: { code: string, roleId: number }) {
-    return await this.personServices.findByCodeAndRole(query.code, query.roleId);
+  async findByCodeAndRole(@Query() query: { code: string; roleId: number }) {
+    return await this.personServices.findByCodeAndRole(
+      query.code,
+      query.roleId,
+    );
   }
 }

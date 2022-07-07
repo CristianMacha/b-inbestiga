@@ -10,12 +10,7 @@ import { AuthService } from './auth.service';
 import { JwtStrategy } from './passport/jwt.strategy';
 
 @Module({
-  imports: [
-    AuthProvider,
-    UserModule,
-    PersonModule,
-    CoreModule,
-  ],
+  imports: [AuthProvider, UserModule, PersonModule, CoreModule],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
   exports: [JwtStrategy],

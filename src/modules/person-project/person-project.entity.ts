@@ -1,27 +1,36 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { Person } from "../person/person.entity";
-import { Project } from "../project/project.entity";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { Person } from '../person/person.entity';
+import { Project } from '../project/project.entity';
 
 @Entity()
 export class PersonProject {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column({ nullable: false, default: true })
-    active: boolean;
+  @Column({ nullable: false, default: true })
+  active: boolean;
 
-    @Column({ nullable: false, default: false })
-    isAdvisor: boolean;
+  @Column({ nullable: false, default: false })
+  isAdvisor: boolean;
 
-    @CreateDateColumn()
-    createdAt: Date;
+  @CreateDateColumn()
+  createdAt: Date;
 
-    @UpdateDateColumn()
-    updatedAt: Date;
+  @UpdateDateColumn()
+  updatedAt: Date;
 
-    @ManyToOne(() => Person, person => person.personProjects)
-    person: Person;
+  @ManyToOne(() => Person, (person) => person.personProjects)
+  person: Person;
 
-    @ManyToOne(() => Project, project => project.personProjects, { nullable: false })
-    project: Project;
-};
+  @ManyToOne(() => Project, (project) => project.personProjects, {
+    nullable: false,
+  })
+  project: Project;
+}

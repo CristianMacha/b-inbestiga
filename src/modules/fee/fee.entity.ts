@@ -47,6 +47,6 @@ export class Fee {
   @ManyToOne(() => Invoice, (invoice) => invoice.fees, { nullable: false })
   invoice: Invoice;
 
-  @ManyToOne(() => Person, person => person.fees, { nullable: false })
+  @ManyToOne(() => Person, (person) => person.fees, { nullable: false })
   person: Person;
 }

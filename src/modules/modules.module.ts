@@ -35,6 +35,6 @@ import { CategoryModule } from './category/category.module';
     ProjectModule,
     PersonProjectModule,
     PetitionModule,
-  ]
+  ],
 })
 export class ModulesModule {}

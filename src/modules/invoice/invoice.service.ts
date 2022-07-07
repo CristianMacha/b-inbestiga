@@ -9,7 +9,7 @@ import { InvoiceRepository } from './invoice.repository';
 
 @Injectable()
 export class InvoiceService {
-  constructor(private invoiceRepository: InvoiceRepository) { }
+  constructor(private invoiceRepository: InvoiceRepository) {}
 
   async findByPerson(personId: number): Promise<Invoice[]> {
     try {
@@ -22,8 +22,12 @@ export class InvoiceService {
 
   async findOneByProject(projectId: number): Promise<Invoice> {
     try {
-      const invoiceDb = await this.invoiceRepository.findOne({ where: { project: { id: projectId } } });
-      if (!invoiceDb) { throw new NotFoundException('Invoice not found.'); }
+      const invoiceDb = await this.invoiceRepository.findOne({
+        where: { project: { id: projectId } },
+      });
+      if (!invoiceDb) {
+        throw new NotFoundException('Invoice not found.');
+      }
 
       return invoiceDb;
     } catch (error) {
@@ -44,7 +48,7 @@ export class InvoiceService {
   async findAll(): Promise<Invoice[]> {
     try {
       const listInvoice = await this.invoiceRepository.find({
-        relations: ['project']
+        relations: ['project'],
       });
       return listInvoice;
     } catch (error) {
@@ -66,7 +70,9 @@ export class InvoiceService {
   async updateActive(invoiceId: number): Promise<Invoice> {
     try {
       const invoiceDb = await this.invoiceRepository.findOne(invoiceId);
-      if (!invoiceDb) { throw new NotFoundException('Invoice not found.'); }
+      if (!invoiceDb) {
+        throw new NotFoundException('Invoice not found.');
+      }
 
       invoiceDb.active = !invoiceDb.active;
       const invoiceUpdated = await this.invoiceRepository.save(invoiceDb);

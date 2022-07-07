@@ -11,7 +11,7 @@ import { IPayloadJwt } from '../../core/interfaces/payload-jwt.interface';
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     private config: ConfigService,
-    private personService: PersonService
+    private personService: PersonService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),

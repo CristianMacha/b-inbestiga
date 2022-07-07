@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { PersonModule } from '../person/person.module';
 
+import { InvoiceModule } from '../invoice/invoice.module';
+import { PersonProjectModule } from '../person-project/person-project.module';
+import { PersonModule } from '../person/person.module';
 import { ProjectController } from './project.controller';
 import { ProjectRepository } from './project.repository';
 import { ProjectService } from './project.service';
@@ -10,8 +12,10 @@ import { ProjectService } from './project.service';
   imports: [
     TypeOrmModule.forFeature([ProjectRepository]),
     PersonModule,
+    InvoiceModule,
+    PersonProjectModule,
   ],
   controllers: [ProjectController],
-  providers: [ProjectService]
+  providers: [ProjectService],
 })
-export class ProjectModule { }
+export class ProjectModule {}
