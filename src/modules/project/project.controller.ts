@@ -5,12 +5,10 @@ import {
   Param,
   Post,
   Put,
-  Req,
   UseGuards,
 } from '@nestjs/common';
 
 import { JwtAuthGuard } from '../../core/guards/jwt-auth.guard';
-import { Person } from '../person/person.entity';
 import { Project } from './project.entity';
 import { ProjectService } from './project.service';
 

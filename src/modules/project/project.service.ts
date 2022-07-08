@@ -27,9 +27,8 @@ export class ProjectService {
         'SERIALIZABLE',
         async (manager) => {
           const newProject = this.projectRepository.create(project);
-          const newProjectCreated = await this.projectRepository.save(
-            newProject,
-          );
+          newProject.status = 'PENDIENTE';
+          const newProjectCreated = await manager.save(newProject);
 
           for await (const invoice of project.invoices) {
             const newInvoice = new Invoice();
@@ -55,6 +54,7 @@ export class ProjectService {
 
       return projectCreated;
     } catch (error) {
+      console.log(error);
       throw new BadRequestException(error);
     }
   }
@@ -79,6 +79,7 @@ export class ProjectService {
           'personProjects.person',
           'category',
           'invoices',
+          'requirements',
         ],
       });
       return projectDb;
@@ -104,8 +105,10 @@ export class ProjectService {
       }
 
       projectDb.active = !projectDb.active;
-      const projectUpdate = await this.projectRepository.save(projectDb);
-      return projectUpdate;
+      await this.projectRepository.save(projectDb);
+
+      const project = await this.findOne(projectDb.id);
+      return project;
     } catch (error) {
       throw new BadRequestException(error);
     }
@@ -133,9 +136,9 @@ export class ProjectService {
             const personProjectDb = await this.personProjectService.findOne(
               personProject.id,
             );
-            if (personProject) {
+            if (personProjectDb) {
               personProjectDb.active = personProject.active;
-              personProject.isAdvisor = personProject.isAdvisor;
+              personProjectDb.isAdvisor = personProject.isAdvisor;
 
               await manager.save(personProjectDb);
             } else {
