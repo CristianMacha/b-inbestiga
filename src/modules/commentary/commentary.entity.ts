@@ -9,6 +9,7 @@ import {
 
 import { Person } from '../person/person.entity';
 import { Project } from '../project/project.entity';
+import { Requirement } from '../requirement/requirement.entity';
 
 @Entity()
 export class Commentary {
@@ -22,9 +23,14 @@ export class Commentary {
   person: Person;
 
   @ManyToOne(() => Project, (project) => project.commentaries, {
-    nullable: false,
+    nullable: true,
   })
   project: Project;
+
+  @ManyToOne(() => Requirement, (requirement) => requirement.commentaries, {
+    nullable: true,
+  })
+  requirement: Requirement;
 
   @Column({ nullable: false, default: true })
   active: boolean;

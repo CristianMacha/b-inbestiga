@@ -3,9 +3,11 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Commentary } from '../commentary/commentary.entity';
 
 import { Project } from '../project/project.entity';
 
@@ -36,4 +38,7 @@ export class Requirement {
     nullable: false,
   })
   project: Project;
+
+  @OneToMany(() => Commentary, (commentary) => commentary.requirement)
+  commentaries: Commentary[];
 }
