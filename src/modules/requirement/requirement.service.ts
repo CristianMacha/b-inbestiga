@@ -47,6 +47,7 @@ export class RequirementService {
     try {
       const listRequirement = await this.requirementRepository.find({
         where: { project: { id: projectId } },
+        order: { createdAt: 'DESC' },
       });
 
       return listRequirement;

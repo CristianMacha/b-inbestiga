@@ -44,6 +44,25 @@ export class CommentaryService {
     }
   }
 
+  async findAllByRequirement(requirementId: number): Promise<Commentary[]> {
+    try {
+      const listCommentary = await this.commentaryRepository.find({
+        relations: ['person'],
+        where: {
+          requirement: { id: requirementId },
+          active: true,
+        },
+        order: {
+          createdAt: 'DESC',
+        },
+      });
+
+      return listCommentary;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+
   async updateActive(commentaryId: number): Promise<Commentary> {
     try {
       const commentaryDb = await this.commentaryRepository.findOne(

@@ -31,6 +31,11 @@ export class CommentaryController {
     return await this.commentaryServices.findAllByProject(+id);
   }
 
+  @Get('requirement/:id')
+  async findAllByRequirement(@Param('id') id: string): Promise<Commentary[]> {
+    return await this.commentaryServices.findAllByRequirement(+id);
+  }
+
   @Get('update/active/:id')
   async updateActive(@Param('id') commentaryId: string): Promise<Commentary> {
     return await this.commentaryServices.updateActive(+commentaryId);

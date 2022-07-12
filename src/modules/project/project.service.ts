@@ -79,7 +79,6 @@ export class ProjectService {
           'personProjects.person',
           'category',
           'invoices',
-          'requirements',
         ],
       });
       return projectDb;

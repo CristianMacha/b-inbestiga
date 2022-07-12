@@ -19,6 +19,9 @@ export class Requirement {
   @Column({ nullable: false })
   name: string;
 
+  @Column()
+  description: string;
+
   @Column({ nullable: false })
   filename: string;
 
