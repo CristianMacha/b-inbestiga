@@ -1,16 +1,15 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { getConnection } from 'typeorm';
+import {BadRequestException, Injectable, NotFoundException,} from '@nestjs/common';
+import {getConnection} from 'typeorm';
+import {nanoid} from "nanoid/async";
 
-import { Invoice } from '../invoice/invoice.entity';
-import { InvoiceService } from '../invoice/invoice.service';
-import { PersonProject } from '../person-project/person-project.entity';
-import { PersonProjectService } from '../person-project/person-project.service';
-import { Project } from './project.entity';
-import { ProjectRepository } from './project.repository';
+import {Invoice} from '../invoice/invoice.entity';
+import {InvoiceService} from '../invoice/invoice.service';
+import {PersonProject} from '../person-project/person-project.entity';
+import {PersonProjectService} from '../person-project/person-project.service';
+import {Project} from './project.entity';
+import {ProjectRepository} from './project.repository';
+import {Fee} from "../fee/fee.entity";
+import {EInvoicePaymentMethod, EStatusPay} from "../../core/enums/status-pay.enum";
 
 @Injectable()
 export class ProjectService {
@@ -27,16 +26,25 @@ export class ProjectService {
         'SERIALIZABLE',
         async (manager) => {
           const newProject = this.projectRepository.create(project);
-          newProject.status = 'PENDIENTE';
+          newProject.status = EStatusPay.PENDING;
           const newProjectCreated = await manager.save(newProject);
 
           for await (const invoice of project.invoices) {
             const newInvoice = new Invoice();
+            newInvoice.code = await nanoid();
             newInvoice.total = invoice.total;
             newInvoice.description = invoice.description;
             newInvoice.expirationDate = invoice.expirationDate;
             newInvoice.project = newProjectCreated;
-            await manager.save(newInvoice);
+            const newInvoiceCreated = await manager.save(newInvoice);
+
+            const newFees = this.generateFees(newInvoiceCreated .feesNumber, newInvoiceCreated.total);
+            for await (const fee of newFees) {
+              fee.code = await nanoid();
+              fee.invoice = newInvoiceCreated;
+
+              await manager.save(fee);
+            }
           }
 
           for await (const personProject of project.personProjects) {
@@ -113,6 +121,21 @@ export class ProjectService {
     }
   }
 
+  async updateProgress(projectId: number, progress: number): Promise<Project> {
+    try {
+      const projectDb = await this.projectRepository.findOne(projectId);
+      if (!projectDb) {
+        throw new NotFoundException('Projectnot found.');
+      }
+
+      projectDb.progress = progress;
+      const projectUpdated = await this.projectRepository.save(projectDb);
+      return projectUpdated;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+
   async update(project: Project): Promise<Project> {
     try {
       const connection = getConnection();
@@ -157,5 +180,20 @@ export class ProjectService {
     } catch (error) {
       throw new BadRequestException(error);
     }
+  }
+  
+  private generateFees(feeCount, invoiceTotal: number): Fee[] {
+    const feePrice = Math.ceil((invoiceTotal / feeCount));
+    const feesTemp: Fee[] = [];
+    for (let i = 0; i < feeCount; i++) {
+      const feeTemp = new Fee();
+      feeTemp.total = feePrice;
+      feeTemp.status = EStatusPay.PENDING;
+      feeTemp.paymentMethod = EInvoicePaymentMethod.CASH_PAYMENT;
+
+      feesTemp.push(feeTemp);
+    }
+
+    return feesTemp;
   }
 }

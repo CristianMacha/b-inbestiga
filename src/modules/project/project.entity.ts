@@ -15,6 +15,7 @@ import { Commentary } from '../commentary/commentary.entity';
 import { Invoice } from '../invoice/invoice.entity';
 import { PersonProject } from '../person-project/person-project.entity';
 import { Requirement } from '../requirement/requirement.entity';
+import {EStatusPay} from "../../core/enums/status-pay.enum";
 
 @Entity()
 export class Project {
@@ -33,8 +34,8 @@ export class Project {
   @Column({ nullable: false, default: true })
   inProgress: boolean;
 
-  @Column({ nullable: false })
-  status: string;
+  @Column({ type: 'enum', enum: EStatusPay, nullable: false, default: EStatusPay.PENDING })
+  status: EStatusPay;
 
   @Column({ type: 'date', nullable: true })
   expirationDate: Date;

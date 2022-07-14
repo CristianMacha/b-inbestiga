@@ -26,7 +26,7 @@ export class Requirement {
   filename: string;
 
   @Column()
-  url: string;
+  code: string;
 
   @Column({ nullable: false, default: true })
   active: boolean;

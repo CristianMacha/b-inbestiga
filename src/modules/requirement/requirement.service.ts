@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { nanoid } from 'nanoid/async';
 
 import { Requirement } from './requirement.entity';
 import { RequirementRepository } from './requirement.repository';
@@ -14,6 +15,7 @@ export class RequirementService {
   async create(requirement: Requirement): Promise<Requirement> {
     try {
       const newRequirement = this.requirementRepository.create(requirement);
+      newRequirement.code = await nanoid();
       const newRequirementCreated = await this.requirementRepository.save(
         newRequirement,
       );

@@ -1,4 +1,3 @@
-import { EStatusPay } from 'src/core/enums/status-pay.enum';
 import {
   Column,
   CreateDateColumn,
@@ -10,11 +9,15 @@ import {
 } from 'typeorm';
 import { Fee } from '../fee/fee.entity';
 import { Project } from '../project/project.entity';
+import {EStatusPay} from "../../core/enums/status-pay.enum";
 
 @Entity()
 export class Invoice {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column()
+  code: string;
 
   @Column()
   total: number;

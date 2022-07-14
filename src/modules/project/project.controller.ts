@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Put,
   UseGuards,
@@ -45,5 +46,13 @@ export class ProjectController {
   @Put()
   async update(@Body() project: Project): Promise<Project> {
     return await this.projectServices.update(project);
+  }
+
+  @Patch('progress/:id')
+  async updateProgress(
+    @Param('id') projectId: string,
+    @Body() body: { progress: number },
+  ): Promise<Project> {
+    return await this.projectServices.updateProgress(+projectId, body.progress);
   }
 }
