@@ -1,21 +1,24 @@
-import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import {Module} from '@nestjs/common';
+import {TypeOrmModule} from '@nestjs/typeorm';
 
-import { InvoiceModule } from '../invoice/invoice.module';
-import { PersonProjectModule } from '../person-project/person-project.module';
-import { PersonModule } from '../person/person.module';
-import { ProjectController } from './project.controller';
-import { ProjectRepository } from './project.repository';
-import { ProjectService } from './project.service';
+import {InvoiceModule} from '../invoice/invoice.module';
+import {PersonProjectModule} from '../person-project/person-project.module';
+import {PersonModule} from '../person/person.module';
+import {ProjectController} from './project.controller';
+import {ProjectRepository} from './project.repository';
+import {ProjectService} from './project.service';
+import {PersonRoleModule} from "../person-role/person-role.module";
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([ProjectRepository]),
-    PersonModule,
-    InvoiceModule,
-    PersonProjectModule,
-  ],
-  controllers: [ProjectController],
-  providers: [ProjectService],
+    imports: [
+        TypeOrmModule.forFeature([ProjectRepository]),
+        PersonModule,
+        InvoiceModule,
+        PersonProjectModule,
+        PersonRoleModule,
+    ],
+    controllers: [ProjectController],
+    providers: [ProjectService],
 })
-export class ProjectModule {}
+export class ProjectModule {
+}

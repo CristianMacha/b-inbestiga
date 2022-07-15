@@ -5,7 +5,7 @@ import {
   Param,
   Patch,
   Post,
-  Put,
+  Put, Req,
   UseGuards,
 } from '@nestjs/common';
 
@@ -23,9 +23,10 @@ export class ProjectController {
     return await this.projectServices.create(project);
   }
 
-  @Get()
-  async findAll(): Promise<Project[]> {
-    return await this.projectServices.findAll();
+  @UseGuards(JwtAuthGuard)
+  @Get('role/:id')
+  async findAll(@Param('id') roleId: string, @Req() req): Promise<Project[]> {
+    return await this.projectServices.findAll(req.user, +roleId);
   }
 
   @Get(':id')

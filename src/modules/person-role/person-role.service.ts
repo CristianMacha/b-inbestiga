@@ -43,4 +43,19 @@ export class PersonRoleService {
             throw new BadRequestException(error);
         }
     }
+
+    async findByPersonAndRole(personId: number, roleId: number): Promise<PersonRole> {
+        try {
+            const personRoleDb = await this.personRoleRepository.findOne({
+                where: {
+                    person: {id: personId},
+                    role: {id: roleId},
+                    active: true,
+                }
+            });
+            return personRoleDb;
+        } catch (error) {
+            throw new BadRequestException(error);
+        }
+    }
 }
