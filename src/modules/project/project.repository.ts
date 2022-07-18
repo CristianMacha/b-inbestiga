@@ -3,33 +3,29 @@ import {ForbiddenException} from "@nestjs/common";
 
 import {Project} from './project.entity';
 import {Person} from "../person/person.entity";
-import {Role} from "../role/role.entity";
 import {ERole} from "../../core/enums/role.enum";
+import {Permission} from "../permission/permission.entity";
+import {EPermission} from "../../core/enums/permission.enum";
 
 @EntityRepository(Project)
 export class ProjectRepository extends Repository<Project> {
 
-    async findByPersonAndRoles(person: Person, roleId: number): Promise<Project[]> {
+    async findByPersonAndRoles(person: Person, permissions: Permission[]): Promise<Project[]> {
         const query = this.createQueryBuilder('project')
             .innerJoinAndSelect('project.personProjects', 'personProject')
             .innerJoinAndSelect('personProject.person', 'person')
             .where('project.deleted=false')
 
-        switch (roleId) {
-            case ERole.STUDENT:
-                query.andWhere('person.id=:personId', {personId: person.id});
-                break;
+        permissions.forEach((permission) => {
+            switch (permission.id) {
+                case EPermission.LIST_ALL_PROJECTS:
+                    break;
 
-            case ERole.ADVISOR:
-                query.andWhere('person.id=:personId', {personId: person.id});
-                break;
-
-            case ERole.ADMINISTRATOR:
-                break;
-
-            default:
-                throw new ForbiddenException('No tiene permisos validos.');
-        }
+                case EPermission.LIST_YOUR_PROJECTS:
+                    query.andWhere('person.id=:personId', {personId: person.id});
+                    break;
+            }
+        });
 
         query.orderBy('project.updatedAt', 'DESC');
         const result = await query.getMany();

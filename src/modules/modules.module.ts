@@ -11,6 +11,8 @@ import { FeeModule } from './fee/fee.module';
 import { CommentaryModule } from './commentary/commentary.module';
 import { PersonRoleModule } from './person-role/person-role.module';
 import { CategoryModule } from './category/category.module';
+import { ResourceModule } from './resource/resource.module';
+import { PermissionModule } from './permission/permission.module';
 
 @Module({
   imports: [
@@ -26,6 +28,8 @@ import { CategoryModule } from './category/category.module';
     CommentaryModule,
     PersonRoleModule,
     CategoryModule,
+    ResourceModule,
+    PermissionModule,
   ],
   exports: [
     RoleModule,

@@ -12,6 +12,8 @@ import {Fee} from "../fee/fee.entity";
 import {EInvoicePaymentMethod, EStatusPay} from "../../core/enums/status-pay.enum";
 import {Person} from "../person/person.entity";
 import {PersonRoleService} from "../person-role/person-role.service";
+import {PermissionService} from "../permission/permission.service";
+import {EResource} from "../../core/enums/resource.enum";
 
 @Injectable()
 export class ProjectService {
@@ -20,6 +22,7 @@ export class ProjectService {
         private invoiceService: InvoiceService,
         private personProjectService: PersonProjectService,
         private personRoleService: PersonRoleService,
+        private permissionService: PermissionService,
     ) {
     }
 
@@ -30,7 +33,6 @@ export class ProjectService {
                 'SERIALIZABLE',
                 async (manager) => {
                     const newProject = this.projectRepository.create(project);
-                    newProject.status = EStatusPay.PENDING;
                     const newProjectCreated = await manager.save(newProject);
 
                     for await (const invoice of project.invoices) {
@@ -75,10 +77,15 @@ export class ProjectService {
         try {
             const personRoleDb = await this.personRoleService.findByPersonAndRole(personAuth.id, roleId);
             if (!personRoleDb) {
-                throw new ForbiddenException('Acceso denegado.')
+                throw new ForbiddenException('Access denied');
             }
 
-            const listProject = await this.projectRepository.findByPersonAndRoles(personAuth, roleId);
+            const permissionsProjectsResource = await this.permissionService.findByRoleAndResource(roleId, EResource.PROJECTS);
+            if (!permissionsProjectsResource) {
+                throw new ForbiddenException('Access denied');
+            }
+
+            const listProject = await this.projectRepository.findByPersonAndRoles(personAuth, permissionsProjectsResource);
             return listProject;
         } catch (error) {
             throw new BadRequestException(error);

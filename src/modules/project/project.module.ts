@@ -8,6 +8,7 @@ import {ProjectController} from './project.controller';
 import {ProjectRepository} from './project.repository';
 import {ProjectService} from './project.service';
 import {PersonRoleModule} from "../person-role/person-role.module";
+import {PermissionModule} from "../permission/permission.module";
 
 @Module({
     imports: [
@@ -16,6 +17,7 @@ import {PersonRoleModule} from "../person-role/person-role.module";
         InvoiceModule,
         PersonProjectModule,
         PersonRoleModule,
+        PermissionModule,
     ],
     controllers: [ProjectController],
     providers: [ProjectService],
