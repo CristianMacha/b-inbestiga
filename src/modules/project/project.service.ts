@@ -14,6 +14,7 @@ import {Person} from "../person/person.entity";
 import {PersonRoleService} from "../person-role/person-role.service";
 import {PermissionService} from "../permission/permission.service";
 import {EResource} from "../../core/enums/resource.enum";
+import {ProjectFilterInterface} from "../../core/interfaces/project-filter.interface";
 
 @Injectable()
 export class ProjectService {
@@ -73,7 +74,7 @@ export class ProjectService {
         }
     }
 
-    async findAll(personAuth: Person, roleId: number): Promise<Project[]> {
+    async findAll(personAuth: Person, roleId: number, filter?: ProjectFilterInterface): Promise<Project[]> {
         try {
             const personRoleDb = await this.personRoleService.findByPersonAndRole(personAuth.id, roleId);
             if (!personRoleDb) {
@@ -85,7 +86,7 @@ export class ProjectService {
                 throw new ForbiddenException('Access denied');
             }
 
-            const listProject = await this.projectRepository.findByPersonAndRoles(personAuth, permissionsProjectsResource);
+            const listProject = await this.projectRepository.findByPersonAndRoles(personAuth, permissionsProjectsResource, filter);
             return listProject;
         } catch (error) {
             throw new BadRequestException(error);

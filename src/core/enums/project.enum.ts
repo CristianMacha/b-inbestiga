@@ -1,3 +1,4 @@
 export enum EProjectStatus {
-    PENDING='PENDIENTE',
+    PENDING = 'PENDIENTE',
+    COMPLETED = 'COMPLETADO'
 }

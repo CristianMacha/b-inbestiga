@@ -1,20 +1,34 @@
 import {EntityRepository, Repository} from 'typeorm';
-import {ForbiddenException} from "@nestjs/common";
 
 import {Project} from './project.entity';
 import {Person} from "../person/person.entity";
-import {ERole} from "../../core/enums/role.enum";
 import {Permission} from "../permission/permission.entity";
 import {EPermission} from "../../core/enums/permission.enum";
+import {EProjectStatus} from "../../core/enums/project.enum";
+import {ProjectFilterInterface} from "../../core/interfaces/project-filter.interface";
 
 @EntityRepository(Project)
 export class ProjectRepository extends Repository<Project> {
 
-    async findByPersonAndRoles(person: Person, permissions: Permission[]): Promise<Project[]> {
+    async findByPersonAndRoles(person: Person, permissions: Permission[], filters?: ProjectFilterInterface): Promise<Project[]> {
         const query = this.createQueryBuilder('project')
             .innerJoinAndSelect('project.personProjects', 'personProject')
             .innerJoinAndSelect('personProject.person', 'person')
             .where('project.deleted=false')
+
+        switch (filters.status) {
+            case EProjectStatus.PENDING:
+                query.andWhere('project.status=:projectStatus', {projectStatus: EProjectStatus.PENDING});
+                break;
+
+            case EProjectStatus.COMPLETED:
+                query.andWhere('project.status=:projectStatus', {projectStatus: EProjectStatus.COMPLETED});
+                break;
+
+            default:
+
+                break;
+        }
 
         permissions.forEach((permission) => {
             switch (permission.id) {
@@ -35,8 +49,8 @@ export class ProjectRepository extends Repository<Project> {
 
     async findByPerson(personId: number): Promise<Project[]> {
         const query = this.createQueryBuilder('project')
-            .innerJoinAndSelect('project.personProjects', 'personProject')
-            .innerJoinAndSelect('personProject.person', 'person')
+            .innerJoin('project.personProjects', 'personProject')
+            .innerJoin('personProject.person', 'person')
             .where('person.id=:personId', {personId})
             .andWhere('project.deleted=false');
 
