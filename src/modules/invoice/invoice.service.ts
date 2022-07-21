@@ -1,21 +1,27 @@
 import {
-    BadRequestException,
+    BadRequestException, ForbiddenException,
     Injectable,
     NotFoundException,
 } from '@nestjs/common';
 
 import {Invoice} from './invoice.entity';
 import {InvoiceRepository} from './invoice.repository';
+import {Person} from "../person/person.entity";
+import {PersonRoleService} from "../person-role/person-role.service";
+import {PermissionService} from "../permission/permission.service";
 
 @Injectable()
 export class InvoiceService {
-    constructor(private invoiceRepository: InvoiceRepository) {
+    constructor(
+        private invoiceRepository: InvoiceRepository,
+        private personRoleService: PersonRoleService,
+        private permissionService: PermissionService,
+    ) {
     }
 
     async findByPerson(personId: number): Promise<Invoice[]> {
         try {
-            const listInvoice = await this.invoiceRepository.findByPerson(personId);
-            return listInvoice;
+            return await this.invoiceRepository.findByPerson(personId);
         } catch (error) {
             throw new BadRequestException(error);
         }
@@ -39,30 +45,36 @@ export class InvoiceService {
     async create(invoice: Invoice): Promise<Invoice> {
         try {
             const newInvoice = this.invoiceRepository.create(invoice);
-            const invoiceCreated = await this.invoiceRepository.save(newInvoice);
-            return invoiceCreated;
+            return await this.invoiceRepository.save(newInvoice);
         } catch (error) {
             throw new BadRequestException(error);
         }
     }
 
-    async findAll(): Promise<Invoice[]> {
+    async findAll(personAuth: Person, roleId: number): Promise<Invoice[]> {
         try {
-            const listInvoice = await this.invoiceRepository.find({
-                relations: ['project', 'project.personProjects', 'project.personProjects.person'],
-            });
-            return listInvoice;
+            const personRoleDb = await this.personRoleService.findByPersonAndRole(personAuth.id, roleId);
+            if (!personRoleDb) {
+                throw new ForbiddenException('Access denied.');
+            }
+
+            const permissionsRole = await this.permissionService.findByRole(roleId);
+            if (permissionsRole.length == 0) {
+                throw new ForbiddenException('Access denied');
+            }
+
+            return await this.invoiceRepository.findByPersonAndRole(personAuth, permissionsRole)
         } catch (error) {
+            console.log(error)
             throw new BadRequestException(error);
         }
     }
 
     async findOne(invoiceId: number): Promise<Invoice> {
         try {
-            const invoiceDb = await this.invoiceRepository.findOne(invoiceId, {
+            return await this.invoiceRepository.findOne(invoiceId, {
                 relations: ['fees', 'project'],
             });
-            return invoiceDb;
         } catch (error) {
             throw new BadRequestException(error);
         }
@@ -76,8 +88,7 @@ export class InvoiceService {
             }
 
             invoiceDb.active = !invoiceDb.active;
-            const invoiceUpdated = await this.invoiceRepository.save(invoiceDb);
-            return invoiceUpdated;
+            return await this.invoiceRepository.save(invoiceDb);
         } catch (error) {
             throw new BadRequestException(error);
         }
@@ -90,8 +101,7 @@ export class InvoiceService {
                 throw new NotFoundException('Invoice not found.');
             }
 
-            const invoiceUpdated = await this.invoiceRepository.save(invoiceDb);
-            return invoiceUpdated;
+            return await this.invoiceRepository.save(invoiceDb);
         } catch (error) {
             throw new BadRequestException(error);
         }

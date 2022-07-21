@@ -8,11 +8,10 @@ export class PermissionService {
     constructor(private permissionRepository: PermissionRepository) {
     }
 
-    async findByRoleAndResource(roleId: number, resourceId: number): Promise<Permission[]> {
+    async findByResource(resourceId: number): Promise<Permission[]> {
         try {
             return await this.permissionRepository.find({
                 where: {
-                    role: {id: roleId},
                     resource: {id: resourceId},
                     active: true,
                     deleted: false,
@@ -23,9 +22,9 @@ export class PermissionService {
         }
     }
 
-    async findAllByPerson(personId: number): Promise<Permission[]> {
+    async findByRole(roleId: number): Promise<Permission[]> {
         try {
-            return await this.permissionRepository.findByPerson(personId);
+            return await this.permissionRepository.findByRole(roleId);
         } catch (error) {
             throw new BadRequestException(error)
         }

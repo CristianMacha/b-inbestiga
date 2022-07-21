@@ -3,15 +3,15 @@ import {EntityRepository, Repository} from 'typeorm';
 import {Project} from './project.entity';
 import {Person} from "../person/person.entity";
 import {Permission} from "../permission/permission.entity";
-import {EPermission} from "../../core/enums/permission.enum";
 import {EProjectStatus} from "../../core/enums/project.enum";
 import {ProjectFilterInterface} from "../../core/interfaces/project-filter.interface";
+import {CPermission} from "../../core/enums/permission.enum";
 
 @EntityRepository(Project)
 export class ProjectRepository extends Repository<Project> {
 
     /**
-     * Obtener lista por persona y rol
+     * Get list by person and role
      * @param person model
      * @param permissions model[]
      * @param filters interface
@@ -38,19 +38,20 @@ export class ProjectRepository extends Repository<Project> {
 
         permissions.forEach((permission) => {
             switch (permission.id) {
-                case EPermission.LIST_ALL_PROJECTS:
+                case CPermission.P_PROJECT.LIST_ALL:
                     break;
 
-                case EPermission.LIST_YOUR_PROJECTS:
+                case CPermission.P_PROJECT.LIST_BY_PERSON:
                     query.andWhere('person.id=:personId', {personId: person.id});
+                    break;
+
+                default:
                     break;
             }
         });
 
         query.orderBy('project.updatedAt', 'DESC');
-        const result = await query.getMany();
-        return result;
-
+        return await query.getMany();
     }
 
     async findByPerson(personId: number): Promise<Project[]> {
@@ -60,7 +61,6 @@ export class ProjectRepository extends Repository<Project> {
             .where('person.id=:personId', {personId})
             .andWhere('project.deleted=false');
 
-        const result = await query.getMany();
-        return result;
+        return await query.getMany();
     }
 }

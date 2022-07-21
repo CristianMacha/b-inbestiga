@@ -1,7 +1,8 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import {Body, Controller, Get, Param, Post, Put, Req, UseGuards} from '@nestjs/common';
 import { Invoice } from './invoice.entity';
 
 import { InvoiceService } from './invoice.service';
+import {JwtAuthGuard} from "../../core/guards/jwt-auth.guard";
 
 @Controller('invoice')
 export class InvoiceController {
@@ -22,9 +23,10 @@ export class InvoiceController {
     return await this.invoiceServices.create(invoice);
   }
 
-  @Get()
-  async findAll(): Promise<Invoice[]> {
-    return await this.invoiceServices.findAll();
+  @UseGuards(JwtAuthGuard)
+  @Get('role/:id')
+  async findAll(@Param('id') roleId: string, @Req() req): Promise<Invoice[]> {
+    return await this.invoiceServices.findAll(req.user, +roleId);
   }
 
   @Get(':id')

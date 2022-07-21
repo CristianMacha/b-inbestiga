@@ -1,6 +1,10 @@
-export enum EPermission {
-    LIST_ALL_PROJECTS = 1,
-    LIST_YOUR_PROJECTS = 2,
-    LIST_ALL_INVOICE = 3,
-    LIST_YOUR_INVOICE = 4,
+export const CPermission = {
+    P_PROJECT: {
+        LIST_ALL: 1,
+        LIST_BY_PERSON: 2,
+    },
+    P_INVOICE: {
+        LIST_ALL: 3,
+        LIST_BY_PERSON: 4
+    }
 }

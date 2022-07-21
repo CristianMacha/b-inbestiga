@@ -83,12 +83,12 @@ export class ProjectService {
                 throw new ForbiddenException('Access denied');
             }
 
-            const permissionsProjectsResource = await this.permissionService.findByRoleAndResource(roleId, EResource.PROJECTS);
-            if (!permissionsProjectsResource) {
+            const permissionsRole = await this.permissionService.findByRole(roleId);
+            if (permissionsRole.length == 0) {
                 throw new ForbiddenException('Access denied');
             }
 
-            const listProject = await this.projectRepository.findByPersonAndRoles(personAuth, permissionsProjectsResource, filter);
+            const listProject = await this.projectRepository.findByPersonAndRoles(personAuth, permissionsRole, filter);
             return listProject;
         } catch (error) {
             throw new BadRequestException(error);
