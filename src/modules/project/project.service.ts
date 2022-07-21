@@ -15,6 +15,7 @@ import {PersonRoleService} from "../person-role/person-role.service";
 import {PermissionService} from "../permission/permission.service";
 import {EResource} from "../../core/enums/resource.enum";
 import {ProjectFilterInterface} from "../../core/interfaces/project-filter.interface";
+import {NanoidService} from "../../core/helpers/nanoid.service";
 
 @Injectable()
 export class ProjectService {
@@ -24,16 +25,17 @@ export class ProjectService {
         private personProjectService: PersonProjectService,
         private personRoleService: PersonRoleService,
         private permissionService: PermissionService,
+        private nanoService: NanoidService,
     ) {
     }
 
     async create(project: Project): Promise<Project> {
         try {
             const connection = getConnection();
-            const projectCreated = await connection.transaction(
-                'SERIALIZABLE',
-                async (manager) => {
+            const projectCreated = await connection.transaction('SERIALIZABLE', async (manager) => {
+                    const projectCode = await this.nanoService.gProjectCode();
                     const newProject = this.projectRepository.create(project);
+                    newProject.code = projectCode;
                     const newProjectCreated = await manager.save(newProject);
 
                     for await (const invoice of project.invoices) {

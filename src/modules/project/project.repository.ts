@@ -10,6 +10,12 @@ import {ProjectFilterInterface} from "../../core/interfaces/project-filter.inter
 @EntityRepository(Project)
 export class ProjectRepository extends Repository<Project> {
 
+    /**
+     * Obtener lista por persona y rol
+     * @param person model
+     * @param permissions model[]
+     * @param filters interface
+     */
     async findByPersonAndRoles(person: Person, permissions: Permission[], filters?: ProjectFilterInterface): Promise<Project[]> {
         const query = this.createQueryBuilder('project')
             .innerJoinAndSelect('project.personProjects', 'personProject')

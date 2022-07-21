@@ -10,16 +10,24 @@ export class PermissionService {
 
     async findByRoleAndResource(roleId: number, resourceId: number): Promise<Permission[]> {
         try {
-            const permissionList = await this.permissionRepository.find({
+            return await this.permissionRepository.find({
                 where: {
                     role: {id: roleId},
+                    resource: {id: resourceId},
                     active: true,
                     deleted: false,
                 }
             });
-            return permissionList;
         } catch (error) {
             throw  new BadRequestException(error);
+        }
+    }
+
+    async findAllByPerson(personId: number): Promise<Permission[]> {
+        try {
+            return await this.permissionRepository.findByPerson(personId);
+        } catch (error) {
+            throw new BadRequestException(error)
         }
     }
 }

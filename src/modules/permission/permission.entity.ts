@@ -1,6 +1,15 @@
-import {Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn} from "typeorm";
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    ManyToOne,
+    OneToMany,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn
+} from "typeorm";
 import {Role} from "../role/role.entity";
 import {Resource} from "../resource/resource.entity";
+import {RolePermission} from "../role-permission/role-permission.entity";
 
 @Entity()
 export class Permission {
@@ -22,8 +31,8 @@ export class Permission {
     @UpdateDateColumn()
     updatedAt: Date;
 
-    @ManyToOne(() => Role, (role) => role.permissions)
-    role: Role;
+    @OneToMany(() => RolePermission, (rolePermission) => rolePermission.permission)
+    rolePermissions: RolePermission[];
 
     @ManyToOne(() => Resource, (resource) => resource.permissions)
     resource: Resource;

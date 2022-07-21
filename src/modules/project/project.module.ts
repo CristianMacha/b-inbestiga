@@ -9,6 +9,7 @@ import {ProjectRepository} from './project.repository';
 import {ProjectService} from './project.service';
 import {PersonRoleModule} from "../person-role/person-role.module";
 import {PermissionModule} from "../permission/permission.module";
+import {CoreModule} from "../../core/core.module";
 
 @Module({
     imports: [
@@ -18,6 +19,7 @@ import {PermissionModule} from "../permission/permission.module";
         PersonProjectModule,
         PersonRoleModule,
         PermissionModule,
+        CoreModule,
     ],
     controllers: [ProjectController],
     providers: [ProjectService],

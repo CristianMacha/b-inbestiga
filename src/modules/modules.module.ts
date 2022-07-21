@@ -13,6 +13,7 @@ import { PersonRoleModule } from './person-role/person-role.module';
 import { CategoryModule } from './category/category.module';
 import { ResourceModule } from './resource/resource.module';
 import { PermissionModule } from './permission/permission.module';
+import { RolePermissionModule } from './role-permission/role-permission.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { PermissionModule } from './permission/permission.module';
     CategoryModule,
     ResourceModule,
     PermissionModule,
+    RolePermissionModule,
   ],
   exports: [
     RoleModule,
