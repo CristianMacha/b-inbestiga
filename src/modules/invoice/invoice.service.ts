@@ -19,6 +19,19 @@ export class InvoiceService {
     ) {
     }
 
+    async findByProject(projectId: number): Promise<Invoice[]> {
+        try {
+            const projectList = await this.invoiceRepository.find({
+                relations: ['project', 'project.personProjects', 'project.personProjects.person'],
+                where: {project: {id: projectId}}
+            });
+
+            return projectList;
+        } catch (e) {
+            throw new BadRequestException(e);
+        }
+    }
+
     async findByPerson(personId: number): Promise<Invoice[]> {
         try {
             return await this.invoiceRepository.findByPerson(personId);
