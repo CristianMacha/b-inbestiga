@@ -9,13 +9,13 @@ import {PersonProjectService} from '../person-project/person-project.service';
 import {Project} from './project.entity';
 import {ProjectRepository} from './project.repository';
 import {Fee} from "../fee/fee.entity";
-import {EInvoicePaymentMethod, EStatusPay} from "../../core/enums/status-pay.enum";
 import {Person} from "../person/person.entity";
 import {PersonRoleService} from "../person-role/person-role.service";
 import {PermissionService} from "../permission/permission.service";
-import {EResource} from "../../core/enums/resource.enum";
 import {ProjectFilterInterface} from "../../core/interfaces/project-filter.interface";
 import {NanoidService} from "../../core/helpers/nanoid.service";
+import {EFeeStatus} from "../../core/enums/fee-status.enum";
+import {EFeePaymentMethod} from "../../core/enums/fee-payment-methods.enum";
 
 @Injectable()
 export class ProjectService {
@@ -204,8 +204,8 @@ export class ProjectService {
         for (let i = 0; i < feeCount; i++) {
             const feeTemp = new Fee();
             feeTemp.total = feePrice;
-            feeTemp.status = EStatusPay.PENDING;
-            feeTemp.paymentMethod = EInvoicePaymentMethod.CASH_PAYMENT;
+            feeTemp.status = EFeeStatus.PENDING;
+            feeTemp.paymentMethod = EFeePaymentMethod.CASH_PAYMENT;
 
             feesTemp.push(feeTemp);
         }

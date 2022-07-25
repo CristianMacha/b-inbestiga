@@ -1,13 +1,9 @@
-import {
-    BadGatewayException,
-    BadRequestException,
-    Injectable,
-    NotFoundException,
-} from '@nestjs/common';
+import {BadGatewayException, BadRequestException, Injectable, NotFoundException,} from '@nestjs/common';
 
 import {Fee} from './fee.entity';
 import {FeeRepository} from './fee.repository';
 import {nanoid} from "nanoid/async";
+import {EFeeStatus} from "../../core/enums/fee-status.enum";
 
 @Injectable()
 export class FeeService {
@@ -69,6 +65,7 @@ export class FeeService {
                 throw new NotFoundException('Fee not found.');
             }
 
+            feeDb.status = EFeeStatus.PROCESSING;
             const feeUpdated = await this.feeRepository.save(feeDb);
             return feeUpdated;
         } catch (error) {
@@ -85,6 +82,20 @@ export class FeeService {
             return listFee;
         } catch (error) {
             throw new BadRequestException(error);
+        }
+    }
+
+    async ValidateFee(feeId: number, fee: Fee): Promise<Fee> {
+        try {
+            const feeDb = await this.feeRepository.findOne(feeId);
+            if(!feeDb) {
+                throw new NotFoundException('Fee not found.');
+            }
+            feeDb.status = fee.status;
+            feeDb.observation = fee.observation;
+            return await this.feeRepository.save(feeDb);
+        } catch (e) {
+            throw new BadRequestException(e);
         }
     }
 }

@@ -8,7 +8,8 @@ import {
 } from 'typeorm';
 import {Invoice} from '../invoice/invoice.entity';
 import {Person} from '../person/person.entity';
-import {EInvoicePaymentMethod, EStatusPay} from "../../core/enums/status-pay.enum";
+import {EFeeStatus} from "../../core/enums/fee-status.enum";
+import {EFeePaymentMethod} from "../../core/enums/fee-payment-methods.enum";
 
 @Entity()
 export class Fee {
@@ -21,10 +22,10 @@ export class Fee {
     @Column({
         nullable: false,
         type: 'enum',
-        enum: EStatusPay,
-        default: EStatusPay.PENDING,
+        enum: EFeeStatus,
+        default: EFeeStatus.PENDING,
     })
-    status: EStatusPay;
+    status: EFeeStatus;
 
     @Column()
     fileName: string;
@@ -35,8 +36,11 @@ export class Fee {
     @Column({nullable: false, default: true})
     active: boolean;
 
-    @Column({nullable: false, type: 'enum', enum: EInvoicePaymentMethod, default: EInvoicePaymentMethod.CASH_PAYMENT})
-    paymentMethod: EInvoicePaymentMethod;
+    @Column()
+    observation: string;
+
+    @Column({nullable: true, type: 'enum', enum: EFeePaymentMethod, default: null})
+    paymentMethod: EFeePaymentMethod;
 
     @CreateDateColumn()
     createdAt: Date;

@@ -22,6 +22,8 @@ export class ProjectRepository extends Repository<Project> {
             .innerJoinAndSelect('personProject.person', 'person')
             .where('project.deleted=false')
 
+        //TODO: El proyecto debe tener almenos un integrante
+
         switch (filters.status) {
             case EProjectStatus.PENDING:
                 query.andWhere('project.status=:projectStatus', {projectStatus: EProjectStatus.PENDING});
