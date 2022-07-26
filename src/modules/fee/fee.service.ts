@@ -1,9 +1,11 @@
 import {BadGatewayException, BadRequestException, Injectable, NotFoundException,} from '@nestjs/common';
+import {getConnection} from "typeorm";
+import {nanoid} from "nanoid/async";
 
 import {Fee} from './fee.entity';
 import {FeeRepository} from './fee.repository';
-import {nanoid} from "nanoid/async";
 import {EFeeStatus} from "../../core/enums/fee-status.enum";
+import {EStatusPay} from "../../core/enums/status-pay.enum";
 
 @Injectable()
 export class FeeService {
@@ -87,13 +89,37 @@ export class FeeService {
 
     async ValidateFee(feeId: number, fee: Fee): Promise<Fee> {
         try {
-            const feeDb = await this.feeRepository.findOne(feeId);
-            if(!feeDb) {
+            const feeDb = await this.feeRepository.findOne(feeId, {
+                relations: ['invoice']
+            });
+            if (!feeDb) {
                 throw new NotFoundException('Fee not found.');
             }
-            feeDb.status = fee.status;
-            feeDb.observation = fee.observation;
-            return await this.feeRepository.save(feeDb);
+
+            const connection = getConnection();
+            const feeUpdated = await connection.transaction('SERIALIZABLE', async manager => {
+                feeDb.status = fee.status;
+                feeDb.observation = fee.observation;
+                const feeDbUpdated = await manager.save(feeDb);
+
+                let feesPaidOutByInvoice = await this.feeRepository.count({
+                    where: {
+                        invoice: {
+                            id: feeDb.invoice.id,
+                        },
+                        status: EFeeStatus.PAID_OUT,
+                        active: true,
+                    }
+                });
+                (fee.status == EFeeStatus.PAID_OUT) && feesPaidOutByInvoice ++;
+                if (feesPaidOutByInvoice == feeDb.invoice.feesNumber) {
+                    feeDb.invoice.status = EStatusPay.PAID_OUT;
+                    await manager.save(feeDb.invoice);
+                }
+
+                return feeDbUpdated;
+            })
+            return feeUpdated;
         } catch (e) {
             throw new BadRequestException(e);
         }
