@@ -41,7 +41,7 @@ export class Project {
     @Column({type: 'enum', enum: EStatusPay, nullable: false, default: EStatusPay.PENDING})
     statusPay: EStatusPay;
 
-    @Column({type: 'enum', enum: EProjectStatus, default: EProjectStatus.PENDING})
+    @Column({type: 'enum', enum: EProjectStatus, default: EProjectStatus.ACCEPTED})
     status: EProjectStatus;
 
     @Column({type: 'date', nullable: true})

@@ -4,8 +4,8 @@ import {Project} from './project.entity';
 import {Person} from "../person/person.entity";
 import {Permission} from "../permission/permission.entity";
 import {EProjectStatus} from "../../core/enums/project.enum";
-import {ProjectFilterInterface} from "../../core/interfaces/project-filter.interface";
 import {CPermission} from "../../core/enums/permission.enum";
+import {ProjectFilterInterface} from "../../core/interfaces/project.interface";
 
 @EntityRepository(Project)
 export class ProjectRepository extends Repository<Project> {
