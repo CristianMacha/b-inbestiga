@@ -8,7 +8,8 @@ import {ResourceRepository} from "./resource.repository";
 @Module({
     imports: [TypeOrmModule.forFeature([ResourceRepository])],
     controllers: [ResourceController],
-    providers: [ResourceService]
+    providers: [ResourceService],
+    exports: [ResourceService],
 })
 export class ResourceModule {
 }

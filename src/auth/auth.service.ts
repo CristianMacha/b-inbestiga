@@ -5,7 +5,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { User } from '../modules/user/user.entity';
 
 import { BcryptService } from '../core/helpers/bcrypt.service';
 import { UserService } from '../modules/user/user.service';

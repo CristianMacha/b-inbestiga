@@ -9,13 +9,14 @@ import {
 
 import {PersonRole} from '../person-role/person-role.entity';
 import {RolePermission} from "../role-permission/role-permission.entity";
+import {RoleResourceEntity} from "../role-resource/role-resource.entity";
 
 @Entity()
 export class Role {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({nullable: false, unique: true})
+    @Column({nullable: false})
     name: string;
 
     @Column({nullable: false, default: true})
@@ -32,4 +33,7 @@ export class Role {
 
     @OneToMany(() => RolePermission, (rolePermission) => rolePermission.role)
     rolePermissions: RolePermission[];
+
+    @OneToMany(() => RoleResourceEntity, roleResource => roleResource.role)
+    roleResources: RoleResourceEntity[];
 }

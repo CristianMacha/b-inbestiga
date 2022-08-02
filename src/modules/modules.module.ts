@@ -14,6 +14,7 @@ import { CategoryModule } from './category/category.module';
 import { ResourceModule } from './resource/resource.module';
 import { PermissionModule } from './permission/permission.module';
 import { RolePermissionModule } from './role-permission/role-permission.module';
+import { RoleResourceModule } from './role-resource/role-resource.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { RolePermissionModule } from './role-permission/role-permission.module';
     ResourceModule,
     PermissionModule,
     RolePermissionModule,
+    RoleResourceModule,
   ],
   exports: [
     RoleModule,

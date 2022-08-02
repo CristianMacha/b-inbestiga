@@ -7,7 +7,7 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn
 } from "typeorm";
-import {Resource} from "../resource/resource.entity";
+import {ResourceEntity} from "../resource/resourceEntity";
 import {RolePermission} from "../role-permission/role-permission.entity";
 
 @Entity()
@@ -33,6 +33,6 @@ export class Permission {
     @OneToMany(() => RolePermission, (rolePermission) => rolePermission.permission)
     rolePermissions: RolePermission[];
 
-    @ManyToOne(() => Resource, (resource) => resource.permissions)
-    resource: Resource;
+    @ManyToOne(() => ResourceEntity, (resource) => resource.permissions)
+    resource: ResourceEntity;
 }

@@ -1,8 +1,9 @@
 import {Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn} from "typeorm";
 import {Permission} from "../permission/permission.entity";
+import {RoleResourceEntity} from "../role-resource/role-resource.entity";
 
-@Entity()
-export class Resource {
+@Entity({name: 'resource'})
+export class ResourceEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -26,4 +27,7 @@ export class Resource {
 
     @OneToMany(() => Permission, (permission) => permission.resource)
     permissions: Permission[];
+
+    @OneToMany(() => RoleResourceEntity, roleResource => roleResource.resource)
+    roleResources: RoleResourceEntity[];
 }
