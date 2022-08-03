@@ -24,18 +24,8 @@ export class ProjectRepository extends Repository<Project> {
 
         //TODO: El proyecto debe tener almenos un integrante
 
-        switch (filters.status) {
-            case EProjectStatus.PENDING:
-                query.andWhere('project.status=:projectStatus', {projectStatus: EProjectStatus.PENDING});
-                break;
-
-            case EProjectStatus.COMPLETED:
-                query.andWhere('project.status=:projectStatus', {projectStatus: EProjectStatus.COMPLETED});
-                break;
-
-            default:
-
-                break;
+        if (filters.status !== 'ALL') {
+                query.andWhere('project.status=:projectStatus', {projectStatus: filters.status});
         }
 
         permissions.forEach((permission) => {

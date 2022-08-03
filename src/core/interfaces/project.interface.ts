@@ -2,7 +2,7 @@ import {EProjectStatus} from "../enums/project.enum";
 import {Project} from "../../modules/project/project.entity";
 
 export interface ProjectFilterInterface {
-    status: EProjectStatus
+    status: EProjectStatus | 'ALL'
     take: number;
     skip: number;
 }
