@@ -7,7 +7,7 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn
 } from "typeorm";
-import {ResourceEntity} from "../resource/resourceEntity";
+import {ResourceEntity} from "../resource/resource.entity";
 import {RolePermission} from "../role-permission/role-permission.entity";
 
 @Entity()

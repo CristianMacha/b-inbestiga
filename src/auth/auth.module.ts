@@ -8,13 +8,15 @@ import {AuthProvider} from './auth.provider';
 import {AuthService} from './auth.service';
 import {JwtStrategy} from './passport/jwt.strategy';
 import {PersonModule} from "../modules/person/person.module";
+import {ResourceModule} from "../modules/resource/resource.module";
 
 @Module({
     imports: [
         AuthProvider,
         UserModule,
         PersonModule,
-        CoreModule
+        CoreModule,
+        ResourceModule,
     ],
     controllers: [AuthController],
     providers: [AuthService, JwtStrategy],

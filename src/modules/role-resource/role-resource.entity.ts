@@ -1,7 +1,7 @@
 import {Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn} from "typeorm";
 
 import {Role} from "../role/role.entity";
-import {ResourceEntity} from "../resource/resourceEntity";
+import {ResourceEntity} from "../resource/resource.entity";
 
 @Entity({name: 'role_resource'})
 export class RoleResourceEntity {

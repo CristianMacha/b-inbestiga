@@ -16,7 +16,11 @@ import {NanoidService} from "../../core/helpers/nanoid.service";
 import {EFeeStatus} from "../../core/enums/fee-status.enum";
 import {EFeePaymentMethod} from "../../core/enums/fee-payment-methods.enum";
 import {EProjectStatus} from "../../core/enums/project.enum";
-import {ProjectAcceptInterface, ProjectFilterInterface} from "../../core/interfaces/project.interface";
+import {
+    ProjectAcceptInterface,
+    ProjectFilterInterface,
+    ProjectResponseInterface
+} from "../../core/interfaces/project.interface";
 import {PersonService} from "../person/person.service";
 
 @Injectable()
@@ -159,7 +163,7 @@ export class ProjectService {
         }
     }
 
-    async findAll(personAuth: Person, roleId: number, filter?: ProjectFilterInterface): Promise<Project[]> {
+    async findAll(personAuth: Person, roleId: number, filter?: ProjectFilterInterface): Promise<ProjectResponseInterface> {
         const personRoleDb = await this.personRoleService.findByPersonAndRole(personAuth.id, roleId);
         if (!personRoleDb) {
             throw new ForbiddenException('Access denied');

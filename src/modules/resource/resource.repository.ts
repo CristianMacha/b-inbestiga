@@ -1,5 +1,5 @@
 import {EntityRepository, Repository} from "typeorm";
-import {ResourceEntity} from "./resourceEntity";
+import {ResourceEntity} from "./resource.entity";
 
 @EntityRepository(ResourceEntity)
 export class ResourceRepository extends Repository<ResourceEntity> {
@@ -8,7 +8,8 @@ export class ResourceRepository extends Repository<ResourceEntity> {
             .innerJoin('resource.roleResources', 'roleResource')
             .innerJoin('roleResource.role', 'role')
             .where('role.id=:roleId', {roleId})
-            .andWhere('resource.active=true');
+            .andWhere('resource.active=true')
+            .orderBy('resource.order', 'ASC');
 
         return await query.getMany();
     }

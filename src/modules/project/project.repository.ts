@@ -5,7 +5,7 @@ import {Person} from "../person/person.entity";
 import {Permission} from "../permission/permission.entity";
 import {EProjectStatus} from "../../core/enums/project.enum";
 import {CPermission} from "../../core/enums/permission.enum";
-import {ProjectFilterInterface} from "../../core/interfaces/project.interface";
+import {ProjectFilterInterface, ProjectResponseInterface} from "../../core/interfaces/project.interface";
 
 @EntityRepository(Project)
 export class ProjectRepository extends Repository<Project> {
@@ -16,7 +16,7 @@ export class ProjectRepository extends Repository<Project> {
      * @param permissions model[]
      * @param filters interface
      */
-    async findByPersonAndRoles(person: Person, permissions: Permission[], filters?: ProjectFilterInterface): Promise<Project[]> {
+    async findByPersonAndRoles(person: Person, permissions: Permission[], filters?: ProjectFilterInterface): Promise<ProjectResponseInterface> {
         const query = this.createQueryBuilder('project')
             .innerJoinAndSelect('project.personProjects', 'personProject')
             .innerJoinAndSelect('personProject.person', 'person')
@@ -52,8 +52,10 @@ export class ProjectRepository extends Repository<Project> {
             }
         });
 
+        query.take(+filters.take);
+        query.skip((+filters.skip) * (+filters.take));
         query.orderBy('project.updatedAt', 'DESC');
-        return await query.getMany();
+        return { data: await query.getMany(), total: await query.getCount()};
     }
 
     async findByPerson(personId: number): Promise<Project[]> {

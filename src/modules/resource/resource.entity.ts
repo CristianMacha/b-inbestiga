@@ -13,6 +13,12 @@ export class ResourceEntity {
     @Column({nullable: false})
     url: string;
 
+    @Column({nullable: false, default: 0})
+    order: number;
+
+    @Column({nullable: false, default: 'none'})
+    icon: string;
+
     @Column({nullable: false, default: true})
     active: boolean;
 

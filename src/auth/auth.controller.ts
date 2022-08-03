@@ -7,9 +7,9 @@ import { AuthService } from './auth.service';
 export class AuthController {
   constructor(private authServices: AuthService) {}
 
-  @Post('signin')
-  async signin(@Body() data: { email: string; password: string }) {
-    return await this.authServices.signin(data.email, data.password);
+  @Post('signing')
+  async signing(@Body() data: { email: string; password: string }) {
+    return await this.authServices.signing(data.email, data.password);
   }
 
   @UseGuards(JwtAuthGuard)

@@ -9,6 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { BcryptService } from '../core/helpers/bcrypt.service';
 import { UserService } from '../modules/user/user.service';
 import { Person } from 'src/modules/person/person.entity';
+import {ResourceService} from "../modules/resource/resource.service";
 
 @Injectable()
 export class AuthService {
@@ -16,9 +17,10 @@ export class AuthService {
     private userServices: UserService,
     private bcryptServices: BcryptService,
     private jwtServices: JwtService,
+    private resourceService: ResourceService,
   ) {}
 
-  async signin(email: string, password: string) {
+  async signing(email: string, password: string) {
     try {
       const userDb = await this.userServices.findByEmail(email);
       if (!userDb) throw new ForbiddenException();
@@ -45,9 +47,10 @@ export class AuthService {
         throw new NotFoundException('User not found.');
       }
 
+      const resources = await this.resourceService.findByRole(personAuth.personRoles[0].role.id);
       const token = await this.generateJwt(userDb.email, userDb.id);
 
-      return { token, userDb };
+      return { token, userDb, resources };
     } catch (error) {
       throw new BadRequestException(error);
     }
