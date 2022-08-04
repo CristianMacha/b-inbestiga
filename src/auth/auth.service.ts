@@ -10,6 +10,7 @@ import { BcryptService } from '../core/helpers/bcrypt.service';
 import { UserService } from '../modules/user/user.service';
 import { Person } from 'src/modules/person/person.entity';
 import {ResourceService} from "../modules/resource/resource.service";
+import {PersonService} from "../modules/person/person.service";
 
 @Injectable()
 export class AuthService {
@@ -18,12 +19,16 @@ export class AuthService {
     private bcryptServices: BcryptService,
     private jwtServices: JwtService,
     private resourceService: ResourceService,
+    private personService: PersonService,
   ) {}
 
   async signing(email: string, password: string) {
     try {
       const userDb = await this.userServices.findByEmail(email);
       if (!userDb) throw new ForbiddenException();
+
+      const personDb = await this.personService.findOneByUser(userDb.id);
+      const resources = await this.resourceService.findByRole(personDb.personRoles[0].id);
 
       const matchedPassword = await this.bcryptServices.compare(
         password,
@@ -34,7 +39,7 @@ export class AuthService {
 
       const token = await this.generateJwt(userDb.email, userDb.id);
 
-      return { token, userDb };
+      return { token, userDb, resources };
     } catch (error) {
       throw new BadRequestException(error);
     }
