@@ -3,9 +3,9 @@ import {EntityRepository, Repository} from 'typeorm';
 import {Project} from './project.entity';
 import {Person} from "../person/person.entity";
 import {Permission} from "../permission/permission.entity";
-import {EProjectStatus} from "../../core/enums/project.enum";
 import {CPermission} from "../../core/enums/permission.enum";
-import {ProjectFilterInterface, ProjectResponseInterface} from "../../core/interfaces/project.interface";
+import {ProjectFilterInterface} from "../../core/interfaces/project.interface";
+import {ResponseListInterface} from "../../core/interfaces/response.interface";
 
 @EntityRepository(Project)
 export class ProjectRepository extends Repository<Project> {
@@ -16,7 +16,7 @@ export class ProjectRepository extends Repository<Project> {
      * @param permissions model[]
      * @param filters interface
      */
-    async findByPersonAndRoles(person: Person, permissions: Permission[], filters?: ProjectFilterInterface): Promise<ProjectResponseInterface> {
+    async findByPersonAndRoles(person: Person, permissions: Permission[], filters?: ProjectFilterInterface): Promise<ResponseListInterface<Project[]>> {
         const query = this.createQueryBuilder('project')
             .innerJoinAndSelect('project.personProjects', 'personProject')
             .innerJoinAndSelect('personProject.person', 'person')
@@ -25,7 +25,7 @@ export class ProjectRepository extends Repository<Project> {
         //TODO: El proyecto debe tener almenos un integrante
 
         if (filters.status !== 'ALL') {
-                query.andWhere('project.status=:projectStatus', {projectStatus: filters.status});
+            query.andWhere('project.status=:projectStatus', {projectStatus: filters.status});
         }
 
         permissions.forEach((permission) => {
@@ -45,7 +45,7 @@ export class ProjectRepository extends Repository<Project> {
         query.take(+filters.take);
         query.skip((+filters.skip) * (+filters.take));
         query.orderBy('project.updatedAt', 'DESC');
-        return { data: await query.getMany(), total: await query.getCount()};
+        return {data: await query.getMany(), total: await query.getCount()};
     }
 
     async findByPerson(personId: number): Promise<Project[]> {

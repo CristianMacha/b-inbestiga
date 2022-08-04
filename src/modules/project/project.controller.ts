@@ -18,8 +18,8 @@ import {ProjectService} from './project.service';
 import {
     ProjectAcceptInterface,
     ProjectFilterInterface,
-    ProjectResponseInterface
 } from "../../core/interfaces/project.interface";
+import {ResponseListInterface} from "../../core/interfaces/response.interface";
 
 @Controller('project')
 export class ProjectController {
@@ -44,7 +44,7 @@ export class ProjectController {
 
     @UseGuards(JwtAuthGuard)
     @Get('role/:id')
-    async findAll(@Param('id') roleId: string, @Req() req, @Query() query: ProjectFilterInterface): Promise<ProjectResponseInterface> {
+    async findAll(@Param('id') roleId: string, @Req() req, @Query() query: ProjectFilterInterface): Promise<ResponseListInterface<Project[]>> {
         return await this.projectServices.findAll(req.user, +roleId, query);
     }
 

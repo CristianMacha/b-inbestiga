@@ -19,9 +19,9 @@ import {EProjectStatus} from "../../core/enums/project.enum";
 import {
     ProjectAcceptInterface,
     ProjectFilterInterface,
-    ProjectResponseInterface
 } from "../../core/interfaces/project.interface";
 import {PersonService} from "../person/person.service";
+import {ResponseListInterface} from "../../core/interfaces/response.interface";
 
 @Injectable()
 export class ProjectService {
@@ -163,7 +163,13 @@ export class ProjectService {
         }
     }
 
-    async findAll(personAuth: Person, roleId: number, filter?: ProjectFilterInterface): Promise<ProjectResponseInterface> {
+    /**
+     * List all with filter and pagination
+     * @param personAuth
+     * @param roleId
+     * @param filter
+     */
+    async findAll(personAuth: Person, roleId: number, filter?: ProjectFilterInterface): Promise<ResponseListInterface<Project[]>> {
         const personRoleDb = await this.personRoleService.findByPersonAndRole(personAuth.id, roleId);
         if (!personRoleDb) {
             throw new ForbiddenException('Access denied');

@@ -1,10 +1,8 @@
 import {EProjectStatus} from "../enums/project.enum";
-import {Project} from "../../modules/project/project.entity";
+import {FilterListInterface} from "./filter.interface";
 
-export interface ProjectFilterInterface {
+export interface ProjectFilterInterface extends FilterListInterface {
     status: EProjectStatus | 'ALL'
-    take: number;
-    skip: number;
 }
 
 export interface ProjectAcceptInterface {
@@ -12,9 +10,4 @@ export interface ProjectAcceptInterface {
     amount: number;
     expirationDate: Date;
     advisorId: number;
-}
-
-export interface ProjectResponseInterface {
-    data: Project[];
-    total: number;
 }

@@ -13,6 +13,8 @@ import {RoleService} from '../role/role.service';
 import {User} from '../user/user.entity';
 import {PersonRole} from '../person-role/person-role.entity';
 import {PersonRoleService} from '../person-role/person-role.service';
+import {ResponseListInterface} from "../../core/interfaces/response.interface";
+import {PersonFilterInterface} from "../../core/interfaces/person.interface";
 
 @Injectable()
 export class PersonService {
@@ -74,12 +76,8 @@ export class PersonService {
         }
     }
 
-    async findAll(): Promise<Person[]> {
-        const listPerson = await this.personRepository.find({
-            relations: ['personRoles', 'personRoles.role', 'user'],
-            order: {updatedAt: 'DESC'}
-        });
-        return listPerson;
+    async findAll(filter: PersonFilterInterface): Promise<ResponseListInterface<Person[]>> {
+        return await this.personRepository.findAll(filter);
     }
 
     async findOne(personId: number): Promise<Person> {

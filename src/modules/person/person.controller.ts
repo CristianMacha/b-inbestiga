@@ -2,6 +2,8 @@ import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 
 import { Person } from './person.entity';
 import { PersonService } from './person.service';
+import {ResponseListInterface} from "../../core/interfaces/response.interface";
+import {PersonFilterInterface} from "../../core/interfaces/person.interface";
 
 @Controller('person')
 export class PersonController {
@@ -13,8 +15,8 @@ export class PersonController {
   }
 
   @Get()
-  async findAll(): Promise<Person[]> {
-    return await this.personServices.findAll();
+  async findAll(@Query() filter: PersonFilterInterface): Promise<ResponseListInterface<Person[]>> {
+    return await this.personServices.findAll(filter);
   }
 
   @Get(':id')
