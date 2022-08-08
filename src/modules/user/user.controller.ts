@@ -19,6 +19,11 @@ export class UserController {
         return await this.userService.updateActive(+userId);
     }
 
+    @Get('update/deleted/:id')
+    async updateDeleted(@Param('id') userId: string): Promise<User> {
+        return await this.userService.updateDeleted(+userId);
+    }
+
     @Put('password/:id')
     async updatePassword(@Param('id') userId: string, @Body() body: { password: string; newPassword: string }): Promise<User> {
         return await this.userService.updatePassword(

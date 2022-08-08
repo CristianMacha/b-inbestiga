@@ -13,10 +13,11 @@ export class PersonRepository extends Repository<Person> {
         const query = this.createQueryBuilder('person')
             .innerJoinAndSelect('person.personRoles', 'personRole')
             .innerJoinAndSelect('personRole.role', 'role')
-            .innerJoinAndSelect('person.user', 'user');
+            .innerJoinAndSelect('person.user', 'user')
+            .where('user.deleted=false')
 
         if (+personFilter.roleId !== 0) {
-            query.where('role.id=:roleId', {roleId: personFilter.roleId});
+            query.andWhere('role.id=:roleId', {roleId: personFilter.roleId});
         }
 
         query.take(+personFilter.take);

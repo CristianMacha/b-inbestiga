@@ -31,27 +31,27 @@ export class UserService {
         try {
             const connection = getConnection();
             const userCreated = await connection.transaction('SERIALIZABLE', async manager => {
-               const passwordHash = await this.bcryptServices.encryptPassword(userRegister.password);
+                const passwordHash = await this.bcryptServices.encryptPassword(userRegister.password);
                 const newUser = new User();
-               newUser.email = userRegister.email;
-               newUser.password = passwordHash;
-               const userCreated = await manager.save(newUser);
+                newUser.email = userRegister.email;
+                newUser.password = passwordHash;
+                const userCreated = await manager.save(newUser);
 
-               const personCode = await this.nanoidService.gUserCode();
-               const newPerson = new Person();
-               newPerson.fullname = userRegister.fullname;
-               newPerson.code = personCode;
-               newPerson.user = userCreated;
-               newPerson.phone = userRegister.phone;
-               const personCreated = await manager.save(newPerson);
+                const personCode = await this.nanoidService.gUserCode();
+                const newPerson = new Person();
+                newPerson.fullname = userRegister.fullname;
+                newPerson.code = personCode;
+                newPerson.user = userCreated;
+                newPerson.phone = userRegister.phone;
+                const personCreated = await manager.save(newPerson);
 
-               const roleStudent = await this.roleService.findOne(ERole.STUDENT);
-               const newPersonRole = new PersonRole();
-               newPersonRole.person = personCreated;
-               newPersonRole.role = roleStudent;
-               await manager.save(newPersonRole);
+                const roleStudent = await this.roleService.findOne(ERole.STUDENT);
+                const newPersonRole = new PersonRole();
+                newPersonRole.person = personCreated;
+                newPersonRole.role = roleStudent;
+                await manager.save(newPersonRole);
 
-               return userCreated;
+                return userCreated;
             });
 
             return userCreated;
@@ -98,6 +98,17 @@ export class UserService {
         } catch (error) {
             throw new BadRequestException(error);
         }
+    }
+
+    async updateDeleted(userId: number): Promise<User> {
+        const userDb = await this.userRepository.findOne(userId);
+        if (!userDb) {
+            throw new NotFoundException('User not found')
+        }
+
+        userDb.deleted = true;
+        const userDbUpdated = await this.userRepository.save(userDb);
+        return userDbUpdated;
     }
 
     async updatePassword(password: string, newPassword: string, userId: number,): Promise<User> {
