@@ -241,6 +241,9 @@ export class ProjectService {
         }
 
         projectDb.progress = progress;
+        if (projectDb.progress == 100) {
+            projectDb.status = EProjectStatus.COMPLETED;
+        }
         return await this.projectRepository.save(projectDb);
     }
 
