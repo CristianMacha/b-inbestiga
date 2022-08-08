@@ -21,6 +21,7 @@ export class ProjectRepository extends Repository<Project> {
             .innerJoinAndSelect('project.personProjects', 'personProject')
             .innerJoinAndSelect('personProject.person', 'person')
             .where('project.deleted=false')
+            .andWhere('project.archived=false')
 
         //TODO: El proyecto debe tener almenos un integrante
 

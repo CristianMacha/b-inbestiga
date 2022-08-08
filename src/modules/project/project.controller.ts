@@ -69,6 +69,16 @@ export class ProjectController {
         return await this.projectServices.updateActive(+projectId);
     }
 
+    @Get('update/archived/:id')
+    async updateArchived(@Param('id') projectId: number): Promise<Project> {
+        return await this.projectServices.updateArchived(projectId);
+    }
+
+    @Get('update/deleted/:id')
+    async updateDeleted(@Param('id') projectId: number): Promise<Project> {
+        return await this.projectServices.updateDeleted(projectId);
+    }
+
     @Put()
     async update(@Body() project: Project): Promise<Project> {
         return await this.projectServices.update(project);

@@ -23,7 +23,7 @@ export class Project {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ nullable: true })
+    @Column({nullable: true})
     code: string;
 
     @Column({nullable: false})
@@ -52,6 +52,9 @@ export class Project {
 
     @Column({nullable: false, default: false})
     deleted: boolean;
+
+    @Column({nullable: false, default: false})
+    archived: boolean;
 
     @CreateDateColumn()
     createdAt: Date;

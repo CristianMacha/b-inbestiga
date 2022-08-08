@@ -16,10 +16,7 @@ import {NanoidService} from "../../core/helpers/nanoid.service";
 import {EFeeStatus} from "../../core/enums/fee-status.enum";
 import {EFeePaymentMethod} from "../../core/enums/fee-payment-methods.enum";
 import {EProjectStatus} from "../../core/enums/project.enum";
-import {
-    ProjectAcceptInterface,
-    ProjectFilterInterface,
-} from "../../core/interfaces/project.interface";
+import {ProjectAcceptInterface, ProjectFilterInterface} from "../../core/interfaces/project.interface";
 import {PersonService} from "../person/person.service";
 import {ResponseListInterface} from "../../core/interfaces/response.interface";
 
@@ -214,9 +211,27 @@ export class ProjectService {
         }
 
         projectDb.active = !projectDb.active;
-        await this.projectRepository.save(projectDb);
+        return await this.projectRepository.save(projectDb);
+    }
 
-        return await this.findOne(projectDb.id);
+    async updateArchived(projectId: number): Promise<Project> {
+        const projectDb = await this.projectRepository.findOne(projectId);
+        if (!projectDb.active) {
+            throw new ForbiddenException(`Cant update project`)
+        }
+
+        projectDb.archived = !projectDb.archived;
+        return await this.projectRepository.save(projectDb);
+    }
+
+    async updateDeleted(projectId: number): Promise<Project> {
+        const projectDb = await this.projectRepository.findOne(projectId);
+        if (!projectDb) {
+            throw new NotFoundException('Not found project.')
+        }
+
+        projectDb.deleted = true;
+        return await this.projectRepository.save(projectDb);
     }
 
     async updateProgress(projectId: number, progress: number): Promise<Project> {
