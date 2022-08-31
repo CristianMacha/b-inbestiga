@@ -1,8 +1,10 @@
-import {Body, Controller, Get, Param, Post, Put, Req, UseGuards} from '@nestjs/common';
+import {Body, Controller, Get, Param, Post, Put, Query, Req, UseGuards} from '@nestjs/common';
 import {Invoice} from './invoice.entity';
 
 import {InvoiceService} from './invoice.service';
 import {JwtAuthGuard} from "../../core/guards/jwt-auth.guard";
+import {InvoiceFilterInterface} from "../../core/interfaces/invoice.interface";
+import {ResponseListInterface} from "../../core/interfaces/response.interface";
 
 @Controller('invoice')
 export class InvoiceController {
@@ -31,8 +33,8 @@ export class InvoiceController {
 
     @UseGuards(JwtAuthGuard)
     @Get('role/:id')
-    async findAll(@Param('id') roleId: string, @Req() req): Promise<Invoice[]> {
-        return await this.invoiceServices.findAll(req.user, +roleId);
+    async findAll(@Param('id') roleId: string, @Req() req, @Query() query: InvoiceFilterInterface): Promise<ResponseListInterface<Invoice[]>> {
+        return await this.invoiceServices.findAll(req.user.person, +roleId, query);
     }
 
     @Get(':id')

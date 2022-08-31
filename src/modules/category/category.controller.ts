@@ -1,28 +1,34 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
-import { Category } from './category.entity';
-import { CategoryService } from './category.service';
+import {Body, Controller, Get, Param, Post, Put} from '@nestjs/common';
+import {Category} from './category.entity';
+import {CategoryService} from './category.service';
 
 @Controller('category')
 export class CategoryController {
-  constructor(private categoryService: CategoryService) {}
+    constructor(private categoryService: CategoryService) {
+    }
 
-  @Post()
-  async create(@Body() category: Category): Promise<Category> {
-    return await this.categoryService.create(category);
-  }
+    @Get('active')
+    findAllActive(): Promise<Category[]> {
+        return this.categoryService.findAllActive();
+    }
 
-  @Get()
-  async findAll(): Promise<Category[]> {
-    return await this.categoryService.findAll();
-  }
+    @Post()
+    async create(@Body() category: Category): Promise<Category> {
+        return await this.categoryService.create(category);
+    }
 
-  @Get('update/active/:id')
-  async updateActive(@Param('id') categoryId: string): Promise<Category> {
-    return await this.categoryService.updateActive(+categoryId);
-  }
+    @Get()
+    async findAll(): Promise<Category[]> {
+        return await this.categoryService.findAll();
+    }
 
-  @Put()
-  async update(@Body() category: Category): Promise<Category> {
-    return await this.categoryService.update(category);
-  }
+    @Get('update/active/:id')
+    async updateActive(@Param('id') categoryId: string): Promise<Category> {
+        return await this.categoryService.updateActive(+categoryId);
+    }
+
+    @Put()
+    async update(@Body() category: Category): Promise<Category> {
+        return await this.categoryService.update(category);
+    }
 }

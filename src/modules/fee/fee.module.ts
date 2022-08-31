@@ -12,6 +12,7 @@ import {InvoiceModule} from "../invoice/invoice.module";
     ],
     controllers: [FeeController],
     providers: [FeeService],
+    exports: [FeeService],
 })
 export class FeeModule {
 }

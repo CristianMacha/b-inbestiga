@@ -1,6 +1,5 @@
 export enum EFeeStatus {
-    PENDING = 'PENDIENTE',
-    PROCESSING = 'PROCESANDO',
-    REFUSED = 'RECHAZADO',
+    DEBT = 'DEUDA',
     PAID_OUT = 'PAGADO',
+    PARTIAL = 'PARCIAL',
 }

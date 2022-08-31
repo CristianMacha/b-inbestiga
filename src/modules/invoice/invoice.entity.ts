@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import {Fee} from '../fee/fee.entity';
 import {Project} from '../project/project.entity';
-import {EStatusPay} from "../../core/enums/status-pay.enum";
+import {InvoiceStatusEnum} from "../../core/enums/invoice.enum";
 
 @Entity()
 export class Invoice {
@@ -28,10 +28,10 @@ export class Invoice {
     @Column({
         nullable: false,
         type: 'enum',
-        enum: EStatusPay,
-        default: EStatusPay.PENDING,
+        enum: InvoiceStatusEnum,
+        default: InvoiceStatusEnum.PENDING,
     })
-    status: EStatusPay;
+    status: InvoiceStatusEnum;
 
     @Column({nullable: true})
     description: string;

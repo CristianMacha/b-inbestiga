@@ -5,10 +5,10 @@ import {ResponseListInterface} from "../../core/interfaces/response.interface";
 
 @EntityRepository(Person)
 export class PersonRepository extends Repository<Person> {
-  /**
-   * Find all by filter
-   * @param personFilter
-   */
+    /**
+     * Find all by filter
+     * @param personFilter
+     */
     async findAll(personFilter: PersonFilterInterface): Promise<ResponseListInterface<Person[]>> {
         const query = this.createQueryBuilder('person')
             .innerJoinAndSelect('person.personRoles', 'personRole')
@@ -46,5 +46,21 @@ export class PersonRepository extends Repository<Person> {
 
         const result = await query.getOne();
         return result;
+    }
+
+    /**
+     * Find persons by nameValue and role
+     * @param nameValue
+     * @param roleId
+     */
+    async findByNameAndRole(nameValue: string, roleId: number): Promise<Person[]> {
+        const query = this.createQueryBuilder('person')
+            .innerJoin('person.personRoles', 'personRole')
+            .innerJoin('personRole.role', 'role')
+            .where('person.fullname LIKE :nameValue', {nameValue: `%${nameValue}%`})
+            .andWhere('person.active=true')
+            .andWhere('role.id=:roleId', {roleId});
+
+        return await query.getMany();
     }
 }

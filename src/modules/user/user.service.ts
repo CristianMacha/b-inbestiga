@@ -39,7 +39,7 @@ export class UserService {
 
                 const personCode = await this.nanoidService.gUserCode();
                 const newPerson = new Person();
-                newPerson.fullname = userRegister.fullname;
+                newPerson.fullName = userRegister.fullName;
                 newPerson.code = personCode;
                 newPerson.user = userCreated;
                 newPerson.phone = userRegister.phone;

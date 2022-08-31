@@ -7,9 +7,7 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 import {Invoice} from '../invoice/invoice.entity';
-import {Person} from '../person/person.entity';
 import {EFeeStatus} from "../../core/enums/fee-status.enum";
-import {EFeePaymentMethod} from "../../core/enums/fee-payment-methods.enum";
 
 @Entity()
 export class Fee {
@@ -23,24 +21,18 @@ export class Fee {
         nullable: false,
         type: 'enum',
         enum: EFeeStatus,
-        default: EFeeStatus.PENDING,
+        default: EFeeStatus.DEBT,
     })
     status: EFeeStatus;
 
-    @Column()
-    fileName: string;
-
-    @Column()
-    code: string;
+    @Column({nullable: false})
+    paymentDate: Date;
 
     @Column({nullable: false, default: true})
     active: boolean;
 
     @Column()
     observation: string;
-
-    @Column({nullable: true, type: 'enum', enum: EFeePaymentMethod, default: null})
-    paymentMethod: EFeePaymentMethod;
 
     @CreateDateColumn()
     createdAt: Date;
@@ -50,7 +42,4 @@ export class Fee {
 
     @ManyToOne(() => Invoice, (invoice) => invoice.fees, {nullable: false})
     invoice: Invoice;
-
-    @ManyToOne(() => Person, (person) => person.fees, {nullable: true})
-    person: Person;
 }

@@ -14,11 +14,11 @@ import {PersonRoleService} from "../person-role/person-role.service";
 import {PermissionService} from "../permission/permission.service";
 import {NanoidService} from "../../core/helpers/nanoid.service";
 import {EFeeStatus} from "../../core/enums/fee-status.enum";
-import {EFeePaymentMethod} from "../../core/enums/fee-payment-methods.enum";
 import {EProjectStatus} from "../../core/enums/project.enum";
 import {ProjectAcceptInterface, ProjectFilterInterface} from "../../core/interfaces/project.interface";
 import {PersonService} from "../person/person.service";
 import {ResponseListInterface} from "../../core/interfaces/response.interface";
+import * as moment from "moment";
 
 @Injectable()
 export class ProjectService {
@@ -61,7 +61,6 @@ export class ProjectService {
             const newFee = new Fee();
             newFee.invoice = invoiceCreated;
             newFee.total = projectAccept.amount;
-            newFee.code = await nanoid();
             await manager.save(newFee);
 
             const newPersonProject = new PersonProject();
@@ -116,48 +115,42 @@ export class ProjectService {
      * @param project
      */
     async create(project: Project): Promise<Project> {
-        try {
-            const connection = getConnection();
-            return await connection.transaction('SERIALIZABLE', async (manager) => {
-                    const projectCode = await this.nanoService.gProjectCode();
-                    const newProject = this.projectRepository.create(project);
-                    newProject.code = projectCode;
-                    const newProjectCreated = await manager.save(newProject);
+        const connection = getConnection();
+        return await connection.transaction('SERIALIZABLE', async (manager) => {
+                const projectCode = await this.nanoService.gProjectCode();
+                const newProject = this.projectRepository.create(project);
+                newProject.code = projectCode;
+                const newProjectCreated = await manager.save(newProject);
 
-                    for await (const invoice of project.invoices) {
-                        const newInvoice = new Invoice();
-                        newInvoice.code = await nanoid();
-                        newInvoice.total = invoice.total;
-                        newInvoice.description = invoice.description;
-                        newInvoice.expirationDate = invoice.expirationDate;
-                        newInvoice.project = newProjectCreated;
-                        const newInvoiceCreated = await manager.save(newInvoice);
+                for await (const invoice of project.invoices) {
+                    const newInvoice = new Invoice();
+                    newInvoice.code = await nanoid();
+                    newInvoice.total = invoice.total;
+                    newInvoice.description = invoice.description;
+                    newInvoice.expirationDate = invoice.expirationDate;
+                    newInvoice.feesNumber = invoice.feesNumber;
+                    newInvoice.project = newProjectCreated;
+                    const newInvoiceCreated = await manager.save(newInvoice);
 
-                        const newFees = ProjectService.generateFees(newInvoiceCreated.feesNumber, newInvoiceCreated.total);
-                        for await (const fee of newFees) {
-                            fee.code = await nanoid();
-                            fee.invoice = newInvoiceCreated;
-
-                            await manager.save(fee);
-                        }
+                    const newFees = ProjectService.generateFees(newInvoiceCreated.feesNumber, newInvoiceCreated.total);
+                    for await (const fee of newFees) {
+                        fee.invoice = newInvoiceCreated;
+                        await manager.save(fee);
                     }
+                }
 
-                    for await (const personProject of project.personProjects) {
-                        const newMember = new PersonProject();
-                        newMember.person = personProject.person;
-                        newMember.project = newProjectCreated;
-                        newMember.isAdvisor = personProject.isAdvisor;
+                for await (const personProject of project.personProjects) {
+                    const newMember = new PersonProject();
+                    newMember.person = personProject.person;
+                    newMember.project = newProjectCreated;
+                    newMember.isAdvisor = personProject.isAdvisor;
 
-                        await manager.save(newMember);
-                    }
+                    await manager.save(newMember);
+                }
 
-                    return newProjectCreated;
-                },
-            );
-        } catch (error) {
-            console.log(error);
-            throw new BadRequestException(error);
-        }
+                return newProjectCreated;
+            },
+        );
     }
 
     /**
@@ -292,13 +285,14 @@ export class ProjectService {
     }
 
     private static generateFees(feeCount, invoiceTotal: number): Fee[] {
+        const currentDate = moment();
         const feePrice = Math.ceil((invoiceTotal / feeCount));
         const feesTemp: Fee[] = [];
         for (let i = 0; i < feeCount; i++) {
             const feeTemp = new Fee();
             feeTemp.total = feePrice;
-            feeTemp.status = EFeeStatus.PENDING;
-            feeTemp.paymentMethod = EFeePaymentMethod.CASH_PAYMENT;
+            feeTemp.status = EFeeStatus.DEBT;
+            feeTemp.paymentDate = currentDate.add(1, 'month').toDate();
 
             feesTemp.push(feeTemp);
         }

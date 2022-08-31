@@ -1,6 +1,6 @@
 export interface UserRegisterInterface {
     email: string;
     password: string;
-    fullname: string;
+    fullName: string;
     phone: string;
 }

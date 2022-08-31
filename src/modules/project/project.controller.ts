@@ -14,10 +14,7 @@ import {
 import {JwtAuthGuard} from '../../core/guards/jwt-auth.guard';
 import {Project} from './project.entity';
 import {ProjectService} from './project.service';
-import {
-    ProjectAcceptInterface,
-    ProjectFilterInterface,
-} from "../../core/interfaces/project.interface";
+import {ProjectAcceptInterface, ProjectFilterInterface} from "../../core/interfaces/project.interface";
 import {ResponseListInterface} from "../../core/interfaces/response.interface";
 
 @Controller('project')
@@ -44,13 +41,13 @@ export class ProjectController {
     @UseGuards(JwtAuthGuard)
     @Get('role/:id')
     async findAll(@Param('id') roleId: string, @Req() req, @Query() query: ProjectFilterInterface): Promise<ResponseListInterface<Project[]>> {
-        return await this.projectServices.findAll(req.user, +roleId, query);
+        return await this.projectServices.findAll(req.user.person, +roleId, query);
     }
 
     @UseGuards(JwtAuthGuard)
     @Post('request')
     async request(@Body() project: Project, @Req() req): Promise<Project> {
-        return await this.projectServices.request(project, req.user);
+        return await this.projectServices.request(project, req.user.person);
     }
 
     @Get(':id')

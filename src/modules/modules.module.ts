@@ -15,6 +15,7 @@ import { ResourceModule } from './resource/resource.module';
 import { PermissionModule } from './permission/permission.module';
 import { RolePermissionModule } from './role-permission/role-permission.module';
 import { RoleResourceModule } from './role-resource/role-resource.module';
+import { PaymentModule } from './payment/payment.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { RoleResourceModule } from './role-resource/role-resource.module';
     PermissionModule,
     RolePermissionModule,
     RoleResourceModule,
+    PaymentModule,
   ],
   exports: [
     RoleModule,

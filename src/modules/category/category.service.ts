@@ -1,8 +1,4 @@
-import {
-    BadRequestException,
-    Injectable,
-    NotFoundException,
-} from '@nestjs/common';
+import {Injectable, NotFoundException} from '@nestjs/common';
 import {Category} from './category.entity';
 import {CategoryRepository} from './category.repository';
 
@@ -11,55 +7,41 @@ export class CategoryService {
     constructor(private categoryRepository: CategoryRepository) {
     }
 
+    async findAllActive(): Promise<Category[]> {
+        return await this.categoryRepository.find({
+            where: {active: true}
+        });
+    }
+
     async create(category: Category): Promise<Category> {
-        try {
-            const newCategory = this.categoryRepository.create(category);
-            const newCategoryCreated = await this.categoryRepository.save(
-                newCategory,
-            );
-            return newCategoryCreated;
-        } catch (error) {
-            throw new BadRequestException(error);
-        }
+        const newCategory = this.categoryRepository.create(category);
+        return await this.categoryRepository.save(
+            newCategory,
+        );
     }
 
     async findAll(): Promise<Category[]> {
-        try {
-            const listCategory = await this.categoryRepository.find({
-                order: {updatedAt: 'DESC'}
-            });
-            return listCategory;
-        } catch (error) {
-            throw new BadRequestException(error);
-        }
+        return await this.categoryRepository.find({
+            order: {updatedAt: 'DESC'}
+        });
     }
 
     async updateActive(categoryId: number): Promise<Category> {
-        try {
-            const categoryDb = await this.categoryRepository.findOne(categoryId);
-            if (!categoryDb) {
-                throw new NotFoundException('Category not found.');
-            }
-
-            categoryDb.active = !categoryDb.active;
-            const categoryUpdated = await this.categoryRepository.save(categoryDb);
-            return categoryUpdated;
-        } catch (error) {
-            throw new BadRequestException(error);
+        const categoryDb = await this.categoryRepository.findOne(categoryId);
+        if (!categoryDb) {
+            throw new NotFoundException('Category not found.');
         }
+
+        categoryDb.active = !categoryDb.active;
+        return await this.categoryRepository.save(categoryDb);
     }
 
     async update(category: Category): Promise<Category> {
-        try {
-            const categoryDb = await this.categoryRepository.preload(category);
-            if (!categoryDb) {
-                throw new NotFoundException('Category not found.');
-            }
-
-            const categoryUpdated = await this.categoryRepository.save(categoryDb);
-            return categoryUpdated;
-        } catch (error) {
-            throw new BadRequestException(error);
+        const categoryDb = await this.categoryRepository.preload(category);
+        if (!categoryDb) {
+            throw new NotFoundException('Category not found.');
         }
+
+        return await this.categoryRepository.save(categoryDb);
     }
 }
