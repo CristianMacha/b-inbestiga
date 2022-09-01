@@ -16,6 +16,6 @@ export class AuthController {
     @UseGuards(JwtAuthGuard)
     @Get('refresh-token/role/:id')
     async refreshToken(@Param('id') roleId: string, @Req() req) {
-        return await this.authServices.refreshToken(req.user.person, +roleId);
+        return await this.authServices.refreshToken(req.user, +roleId);
     }
 }

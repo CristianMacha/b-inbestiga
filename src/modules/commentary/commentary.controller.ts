@@ -23,7 +23,7 @@ export class CommentaryController {
     @Body() commentary: Commentary,
     @Req() req,
   ): Promise<Commentary> {
-    return await this.commentaryServices.create(commentary, req.user.person);
+    return await this.commentaryServices.create(commentary, req.user);
   }
 
   @Get('project/:id')

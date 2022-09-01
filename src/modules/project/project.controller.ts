@@ -41,18 +41,19 @@ export class ProjectController {
     @UseGuards(JwtAuthGuard)
     @Get('role/:id')
     async findAll(@Param('id') roleId: string, @Req() req, @Query() query: ProjectFilterInterface): Promise<ResponseListInterface<Project[]>> {
-        return await this.projectServices.findAll(req.user.person, +roleId, query);
+        return await this.projectServices.findAll(req.user, +roleId, query);
     }
 
     @UseGuards(JwtAuthGuard)
     @Post('request')
     async request(@Body() project: Project, @Req() req): Promise<Project> {
-        return await this.projectServices.request(project, req.user.person);
+        return await this.projectServices.request(project, req.user);
     }
 
+    @UseGuards(JwtAuthGuard)
     @Get(':id')
-    async findOne(@Param('id') id: string): Promise<Project> {
-        return await this.projectServices.findOne(+id);
+    async findOne(@Param('id') id: string, @Req() req): Promise<Project> {
+        return await this.projectServices.findOne(+id, req.user, +req.headers.data);
     }
 
     @Get('person/:id')

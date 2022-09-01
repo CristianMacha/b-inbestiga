@@ -34,7 +34,7 @@ export class InvoiceController {
     @UseGuards(JwtAuthGuard)
     @Get('role/:id')
     async findAll(@Param('id') roleId: string, @Req() req, @Query() query: InvoiceFilterInterface): Promise<ResponseListInterface<Invoice[]>> {
-        return await this.invoiceServices.findAll(req.user.person, +roleId, query);
+        return await this.invoiceServices.findAll(req.user, +roleId, query);
     }
 
     @Get(':id')

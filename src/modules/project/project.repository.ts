@@ -6,6 +6,7 @@ import {Permission} from "../permission/permission.entity";
 import {CPermission} from "../../core/enums/permission.enum";
 import {ProjectFilterInterface} from "../../core/interfaces/project.interface";
 import {ResponseListInterface} from "../../core/interfaces/response.interface";
+import {ERole} from "../../core/enums/role.enum";
 
 @EntityRepository(Project)
 export class ProjectRepository extends Repository<Project> {
@@ -57,5 +58,22 @@ export class ProjectRepository extends Repository<Project> {
             .andWhere('project.deleted=false');
 
         return await query.getMany();
+    }
+
+    async findOneByRole(projectId: number, person: Person, roleId: number): Promise<Project> {
+        const query = this.createQueryBuilder('project')
+            .innerJoinAndSelect('project.personProjects', 'personProject')
+            .innerJoinAndSelect('personProject.person', 'person')
+            .innerJoinAndSelect('project.category', 'category')
+            .innerJoinAndSelect('project.invoices', 'invoice');
+
+        if (roleId !== ERole.ADMINISTRATOR) {
+            query.where('person.id=:personId', {personId: person.id});
+            query.andWhere('project.id=:projectId', {projectId});
+            query.andWhere('project.active=true');
+            query.andWhere('project.deleted=false');
+        }
+
+        return await query.getOne();
     }
 }

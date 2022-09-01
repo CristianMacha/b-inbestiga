@@ -12,6 +12,6 @@ export class PersonRoleController {
     @UseGuards(JwtAuthGuard)
     @Get('person')
     async findPersonRolesByUser(@Req() req): Promise<PersonRole[]> {
-        return await this.personRoleService.findByPerson(req.user.person);
+        return await this.personRoleService.findByPerson(req.user);
     }
 }

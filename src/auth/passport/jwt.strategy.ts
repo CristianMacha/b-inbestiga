@@ -28,8 +28,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         const personDb = await this.personService.findOneByUser(payload.userId);
         if (!personDb) return null;
 
-        const role = await this.roleService.findOne(payload.roleId);
-
-        return {person: personDb, role};
+        return personDb;
     }
 }

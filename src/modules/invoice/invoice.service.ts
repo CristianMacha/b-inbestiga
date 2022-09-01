@@ -94,8 +94,4 @@ export class InvoiceService {
 
         return await this.invoiceRepository.save(invoiceDb);
     }
-
-    async verifyPaymentsFee(invoiceId: number) {
-        return
-    }
 }

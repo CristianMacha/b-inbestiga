@@ -45,7 +45,7 @@ export class AuthService {
 
         if (!matchedPassword) throw new ForbiddenException();
 
-        const token = await this.generateJwt(userDb.email, userDb.id, 0);
+        const token = await this.generateJwt(userDb.email, userDb.id);
 
         return {token, userDb, personRoles};
     }
@@ -62,12 +62,12 @@ export class AuthService {
         }
 
         const resources = await this.resourceService.findByRole(roleId);
-        const token = await this.generateJwt(userDb.email, userDb.id, roleId);
+        const token = await this.generateJwt(userDb.email, userDb.id);
 
         return {token, userDb, resources};
     }
 
-    private async generateJwt(email: string, userId: number, roleId: number) {
-        return await this.jwtServices.signAsync({email, userId, roleId});
+    private async generateJwt(email: string, userId: number) {
+        return await this.jwtServices.signAsync({email, userId});
     }
 }

@@ -12,7 +12,7 @@ export class FeeController {
     @UseGuards(JwtAuthGuard)
     @Get('invoice/:id')
     async findByInvoice(@Param('id') invoiceId: string, @Req() req): Promise<Fee[]> {
-        return await this.feeServices.findByInvoice(+invoiceId, req.user.person);
+        return await this.feeServices.findByInvoice(+invoiceId, req.user);
     }
 
     @Post()

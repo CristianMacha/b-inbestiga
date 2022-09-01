@@ -173,20 +173,8 @@ export class ProjectService {
         return await this.projectRepository.findByPersonAndRoles(personAuth, permissionsRole, filter);
     }
 
-    async findOne(projectId: number): Promise<Project> {
-        try {
-            return await this.projectRepository.findOne(projectId, {
-                relations: [
-                    'personProjects',
-                    'personProjects.person',
-                    'personProjects.person.user',
-                    'category',
-                    'invoices',
-                ],
-            });
-        } catch (error) {
-            throw new BadRequestException(error);
-        }
+    async findOne(projectId: number, personAuth: Person, roleIdAuth: number): Promise<Project> {
+        return await this.projectRepository.findOneByRole(projectId, personAuth, roleIdAuth);
     }
 
     async findByPerson(personId: number): Promise<Project[]> {
