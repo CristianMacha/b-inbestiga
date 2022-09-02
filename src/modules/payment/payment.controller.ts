@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Param, Patch, Post, Query, Req, UseGuards} from '@nestjs/common';
+import {Body, Controller, Get, Param, Patch, Post, Put, Query, Req, UseGuards} from '@nestjs/common';
 import {PaymentService} from "./payment.service";
 import {PaymentCreateInterface} from "../../core/interfaces/payment.interface";
 import {PaymentEntity} from "./payment.entity";
@@ -35,5 +35,11 @@ export class PaymentController {
     @Patch('amount/fee')
     updateAmountFee(@Body() body: { paymentId: number, amount: number }, @Req() req): Promise<PaymentEntity> {
         return this.paymentService.updateAmountFee(body.paymentId, body.amount, req.headers.data)
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Put(':id')
+    update(@Param('id') paymentId: string, @Body() payment: PaymentEntity): Promise<PaymentEntity> {
+        return this.paymentService.update(+paymentId, payment);
     }
 }

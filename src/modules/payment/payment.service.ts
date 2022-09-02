@@ -1,12 +1,12 @@
 import {ForbiddenException, Injectable, NotFoundException} from '@nestjs/common';
 import {nanoid} from "nanoid/async";
+import {getConnection, Not} from "typeorm";
 import {PaymentRepository} from "./payment.repository";
 import {PaymentEntity} from "./payment.entity";
 import {PaymentCreateInterface} from "../../core/interfaces/payment.interface";
 import {FeeService} from "../fee/fee.service";
 import {Person} from "../person/person.entity";
 import {PaymentConceptEnum, PaymentStatusEnum} from "../../core/enums/payment.enum";
-import {getConnection, Not} from "typeorm";
 import {EFeeStatus} from "../../core/enums/fee-status.enum";
 import {InvoiceStatusEnum} from "../../core/enums/invoice.enum";
 import {ERole} from "../../core/enums/role.enum";
@@ -176,6 +176,18 @@ export class PaymentService {
                 status: PaymentStatusEnum.VERIFIED,
             }
         });
+    }
+
+    async update(paymentId: number, payment: PaymentEntity): Promise<PaymentEntity> {
+        const paymentDb = await this.paymentRepository.findOne(paymentId, {
+            where: {
+                active: true,
+                deleted: false,
+            }
+        });
+
+        paymentDb.amount = payment.amount;
+        return await this.paymentRepository.save(paymentDb);
     }
 
     private sumTotalPayments(payments: PaymentEntity[]): number {
