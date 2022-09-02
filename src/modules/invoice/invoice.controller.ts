@@ -37,9 +37,10 @@ export class InvoiceController {
         return await this.invoiceServices.findAll(req.user, +roleId, query);
     }
 
+    @UseGuards(JwtAuthGuard)
     @Get(':id')
-    async findOne(@Param('id') id: string): Promise<Invoice> {
-        return await this.invoiceServices.findOne(+id);
+    async findOne(@Param('id') id: string, @Req() req): Promise<Invoice> {
+        return await this.invoiceServices.findOneForRole(+id, req.user, +req.headers.data);
     }
 
     @Get('update/active/:id')

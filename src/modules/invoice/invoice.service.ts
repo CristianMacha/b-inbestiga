@@ -70,10 +70,14 @@ export class InvoiceService {
         return await this.invoiceRepository.findByPersonAndRole(personAuth, permissionsRole, filter);
     }
 
+    async findOneForRole(invoiceId: number, personAuth: Person, roleId: number): Promise<Invoice> {
+        return await this.invoiceRepository.findOneForRole(invoiceId, personAuth, roleId);
+    }
+
     async findOne(invoiceId: number): Promise<Invoice> {
         return await this.invoiceRepository.findOne(invoiceId, {
             relations: ['fees', 'project'],
-        });
+        })
     }
 
     async updateActive(invoiceId: number): Promise<Invoice> {

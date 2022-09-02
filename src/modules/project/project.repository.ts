@@ -65,14 +65,15 @@ export class ProjectRepository extends Repository<Project> {
             .innerJoinAndSelect('project.personProjects', 'personProject')
             .innerJoinAndSelect('personProject.person', 'person')
             .innerJoinAndSelect('project.category', 'category')
-            .innerJoinAndSelect('project.invoices', 'invoice');
+            .innerJoinAndSelect('project.invoices', 'invoice')
+            .where('project.id=:projectId', {projectId});
 
         if (roleId !== ERole.ADMINISTRATOR) {
-            query.where('person.id=:personId', {personId: person.id});
-            query.andWhere('project.id=:projectId', {projectId});
-            query.andWhere('project.active=true');
-            query.andWhere('project.deleted=false');
+            query.andWhere('person.id=:personId', {personId: person.id});
         }
+
+        query.andWhere('project.active=true');
+        query.andWhere('project.deleted=false');
 
         return await query.getOne();
     }

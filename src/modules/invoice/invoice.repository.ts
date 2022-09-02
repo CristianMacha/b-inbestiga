@@ -5,6 +5,7 @@ import {Permission} from "../permission/permission.entity";
 import {CPermission} from "../../core/enums/permission.enum";
 import {InvoiceFilterInterface} from "../../core/interfaces/invoice.interface";
 import {ResponseListInterface} from "../../core/interfaces/response.interface";
+import {ERole} from "../../core/enums/role.enum";
 
 @EntityRepository(Invoice)
 export class InvoiceRepository extends Repository<Invoice> {
@@ -49,5 +50,21 @@ export class InvoiceRepository extends Repository<Invoice> {
 
         const listInvoice = await query.getMany();
         return listInvoice;
+    }
+
+    async findOneForRole(invoiceId: number, person: Person, roleId: number): Promise<Invoice> {
+        const query = this.createQueryBuilder('invoice')
+            .innerJoinAndSelect('invoice.fees', 'fee')
+            .innerJoinAndSelect('invoice.project', 'project')
+            .where('invoice.id=:invoiceId', {invoiceId});
+
+        if (roleId !== ERole.ADMINISTRATOR) {
+            query.innerJoin('project.personProjects', 'personProject');
+            query.innerJoin('personProject.person', 'person');
+            query.andWhere('person.id=:personId', {personId: person.id});
+        }
+
+        query.andWhere('invoice.active=true');
+        return await query.getOne();
     }
 }
