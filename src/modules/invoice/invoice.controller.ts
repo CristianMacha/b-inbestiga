@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Param, Post, Put, Query, Req, UseGuards} from '@nestjs/common';
+import {Body, Controller, Get, Param, Patch, Post, Put, Query, Req, UseGuards} from '@nestjs/common';
 import {Invoice} from './invoice.entity';
 
 import {InvoiceService} from './invoice.service';
@@ -51,5 +51,11 @@ export class InvoiceController {
     @Put()
     async update(@Body() invoice: Invoice): Promise<Invoice> {
         return await this.invoiceServices.update(invoice);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Patch('total/:id')
+    updateTotal(@Param('id') invoiceId: string, @Body() body: { total: number }): Promise<Invoice> {
+        return this.invoiceServices.updateTotal(+invoiceId, body.total);
     }
 }
