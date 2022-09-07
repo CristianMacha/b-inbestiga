@@ -56,6 +56,9 @@ export class Project {
     @Column({nullable: false, default: false})
     archived: boolean;
 
+    @Column({nullable: true})
+    otherCategory: string;
+
     @CreateDateColumn()
     createdAt: Date;
 

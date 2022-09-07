@@ -10,12 +10,14 @@ import {PaymentConceptEnum, PaymentStatusEnum} from "../../core/enums/payment.en
 import {EFeeStatus} from "../../core/enums/fee-status.enum";
 import {InvoiceStatusEnum} from "../../core/enums/invoice.enum";
 import {ERole} from "../../core/enums/role.enum";
+import { NanoidService } from '../../core/helpers/nanoid.service';
 
 @Injectable()
 export class PaymentService {
     constructor(
         private paymentRepository: PaymentRepository,
         private feeServices: FeeService,
+        private nanoid: NanoidService
     ) {
     }
 
@@ -50,7 +52,7 @@ export class PaymentService {
         newPayment.amount = paymentCreate.amount;
         newPayment.conceptId = fee.id;
         newPayment.concept = PaymentConceptEnum.FEE;
-        newPayment.code = await nanoid();
+        newPayment.code = await this.nanoid.gPaymentCode();
         newPayment.person = personAuth;
         newPayment.paymentMethod = paymentCreate.paymentMethod;
 

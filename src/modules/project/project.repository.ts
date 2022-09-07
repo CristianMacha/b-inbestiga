@@ -64,12 +64,13 @@ export class ProjectRepository extends Repository<Project> {
         const query = this.createQueryBuilder('project')
             .innerJoinAndSelect('project.personProjects', 'personProject')
             .innerJoinAndSelect('personProject.person', 'person')
+            .innerJoinAndSelect('person.user', 'user')
             .innerJoinAndSelect('project.category', 'category')
             .innerJoinAndSelect('project.invoices', 'invoice')
             .where('project.id=:projectId', {projectId});
 
         if (roleId !== ERole.ADMINISTRATOR) {
-            query.andWhere('person.id=:personId', {personId: person.id});
+            //query.andWhere('person.id=:personId', {personId: person.id});
         }
 
         query.andWhere('project.active=true');
@@ -77,4 +78,5 @@ export class ProjectRepository extends Repository<Project> {
 
         return await query.getOne();
     }
+
 }

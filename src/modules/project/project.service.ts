@@ -54,14 +54,15 @@ export class ProjectService {
             newInvoice.project = projectUpdated;
             newInvoice.total = projectAccept.amount;
             newInvoice.code = await this.nanoService.gProjectCode();
-            newInvoice.feesNumber = 1;
+            newInvoice.feesNumber = projectAccept.feesNumber;
             newInvoice.expirationDate = projectUpdated.expirationDate;
             const invoiceCreated = await manager.save(newInvoice);
 
-            const newFee = new Fee();
-            newFee.invoice = invoiceCreated;
-            newFee.total = projectAccept.amount;
-            await manager.save(newFee);
+            const fees = this.generateFees(invoiceCreated.feesNumber, invoiceCreated.total);
+            for await (const fee of fees) {
+                fee.invoice = invoiceCreated;
+                await manager.save(fee);
+            }
 
             const newPersonProject = new PersonProject();
             newPersonProject.project = projectDb;
@@ -120,6 +121,7 @@ export class ProjectService {
                 const projectCode = await this.nanoService.gProjectCode();
                 const newProject = this.projectRepository.create(project);
                 newProject.code = projectCode;
+                newProject.status = EProjectStatus.PENDING;
                 const newProjectCreated = await manager.save(newProject);
 
                 for await (const invoice of project.invoices) {
@@ -132,7 +134,7 @@ export class ProjectService {
                     newInvoice.project = newProjectCreated;
                     const newInvoiceCreated = await manager.save(newInvoice);
 
-                    const newFees = ProjectService.generateFees(newInvoiceCreated.feesNumber, newInvoiceCreated.total);
+                    const newFees = this.generateFees(newInvoiceCreated.feesNumber, newInvoiceCreated.total);
                     for await (const fee of newFees) {
                         fee.invoice = newInvoiceCreated;
                         await manager.save(fee);
@@ -272,7 +274,7 @@ export class ProjectService {
         }
     }
 
-    private static generateFees(feeCount, invoiceTotal: number): Fee[] {
+    private generateFees(feeCount, invoiceTotal: number): Fee[] {
         const currentDate = moment();
         const feePrice = Math.ceil((invoiceTotal / feeCount));
         const feesTemp: Fee[] = [];

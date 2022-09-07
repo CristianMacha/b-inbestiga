@@ -20,4 +20,14 @@ export class NanoidService {
             throw new Error('NanoId error generate');
         }
     }
+
+    async gPaymentCode(): Promise<string> {
+        try {
+            const alphabet = '0123456789P';
+            const nanoId = customAlphabet(alphabet, 7);
+            return await nanoId();
+        } catch (error) {
+            throw new Error('NanoId error generate.');
+        }
+    }
 }

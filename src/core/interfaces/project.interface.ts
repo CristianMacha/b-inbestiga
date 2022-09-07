@@ -8,6 +8,7 @@ export interface ProjectFilterInterface extends FilterListInterface {
 export interface ProjectAcceptInterface {
     projectId: number;
     amount: number;
+    feesNumber: number;
     expirationDate: Date;
     advisorId: number;
 }
