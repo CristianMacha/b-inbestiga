@@ -1,12 +1,12 @@
-import {EntityRepository, Repository} from 'typeorm';
+import { EntityRepository, Repository } from 'typeorm';
 
-import {Project} from './project.entity';
-import {Person} from "../person/person.entity";
-import {Permission} from "../permission/permission.entity";
-import {CPermission} from "../../core/enums/permission.enum";
-import {ProjectFilterInterface} from "../../core/interfaces/project.interface";
-import {ResponseListInterface} from "../../core/interfaces/response.interface";
-import {ERole} from "../../core/enums/role.enum";
+import { Project } from './project.entity';
+import { Person } from "../person/person.entity";
+import { Permission } from "../permission/permission.entity";
+import { CPermission } from "../../core/enums/permission.enum";
+import { ProjectFilterInterface } from "../../core/interfaces/project.interface";
+import { ResponseListInterface } from "../../core/interfaces/response.interface";
+import { ERole } from "../../core/enums/role.enum";
 
 @EntityRepository(Project)
 export class ProjectRepository extends Repository<Project> {
@@ -27,7 +27,7 @@ export class ProjectRepository extends Repository<Project> {
         //TODO: El proyecto debe tener almenos un integrante
 
         if (filters.status !== 'ALL') {
-            query.andWhere('project.status=:projectStatus', {projectStatus: filters.status});
+            query.andWhere('project.status=:projectStatus', { projectStatus: filters.status });
         }
 
         permissions.forEach((permission) => {
@@ -36,7 +36,7 @@ export class ProjectRepository extends Repository<Project> {
                     break;
 
                 case CPermission.P_PROJECT.LIST_BY_PERSON:
-                    query.andWhere('person.id=:personId', {personId: person.id});
+                    query.andWhere('person.id=:personId', { personId: person.id });
                     break;
 
                 default:
@@ -47,27 +47,32 @@ export class ProjectRepository extends Repository<Project> {
         query.take(+filters.take);
         query.skip((+filters.skip) * (+filters.take));
         query.orderBy('project.updatedAt', 'DESC');
-        return {data: await query.getMany(), total: await query.getCount()};
+        return { data: await query.getMany(), total: await query.getCount() };
     }
 
     async findByPerson(personId: number): Promise<Project[]> {
         const query = this.createQueryBuilder('project')
             .innerJoin('project.personProjects', 'personProject')
             .innerJoin('personProject.person', 'person')
-            .where('person.id=:personId', {personId})
+            .where('person.id=:personId', { personId })
             .andWhere('project.deleted=false');
 
         return await query.getMany();
     }
 
-    async findOneByRole(projectId: number, person: Person, roleId: number): Promise<Project> {
+    async findOneByRole(projectId: number, person: Person, roleId: number, withInvoice: string): Promise<Project> {
         const query = this.createQueryBuilder('project')
             .innerJoinAndSelect('project.personProjects', 'personProject')
             .innerJoinAndSelect('personProject.person', 'person')
             .innerJoinAndSelect('person.user', 'user')
             .innerJoinAndSelect('project.category', 'category')
-            .innerJoinAndSelect('project.invoices', 'invoice')
-            .where('project.id=:projectId', {projectId});
+
+        if (withInvoice === 'true') {
+            console.log(withInvoice);
+            
+            query.innerJoinAndSelect('project.invoices', 'invoice');
+        }
+        query.where('project.id=:projectId', { projectId });
 
         if (roleId !== ERole.ADMINISTRATOR) {
             //query.andWhere('person.id=:personId', {personId: person.id});
@@ -78,5 +83,4 @@ export class ProjectRepository extends Repository<Project> {
 
         return await query.getOne();
     }
-
 }

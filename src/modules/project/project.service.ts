@@ -175,8 +175,8 @@ export class ProjectService {
         return await this.projectRepository.findByPersonAndRoles(personAuth, permissionsRole, filter);
     }
 
-    async findOne(projectId: number, personAuth: Person, roleIdAuth: number): Promise<Project> {
-        return await this.projectRepository.findOneByRole(projectId, personAuth, roleIdAuth);
+    async findOne(projectId: number, personAuth: Person, roleIdAuth: number, withInvoice: string): Promise<Project> {
+        return await this.projectRepository.findOneByRole(projectId, personAuth, roleIdAuth, withInvoice);
     }
 
     async findByPerson(personId: number): Promise<Project[]> {

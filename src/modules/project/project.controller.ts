@@ -11,11 +11,11 @@ import {
     UseGuards
 } from '@nestjs/common';
 
-import {JwtAuthGuard} from '../../core/guards/jwt-auth.guard';
-import {Project} from './project.entity';
-import {ProjectService} from './project.service';
-import {ProjectAcceptInterface, ProjectFilterInterface} from "../../core/interfaces/project.interface";
-import {ResponseListInterface} from "../../core/interfaces/response.interface";
+import { JwtAuthGuard } from '../../core/guards/jwt-auth.guard';
+import { Project } from './project.entity';
+import { ProjectService } from './project.service';
+import { ProjectAcceptInterface, ProjectFilterInterface } from "../../core/interfaces/project.interface";
+import { ResponseListInterface } from "../../core/interfaces/response.interface";
 
 @Controller('project')
 export class ProjectController {
@@ -52,8 +52,8 @@ export class ProjectController {
 
     @UseGuards(JwtAuthGuard)
     @Get(':id')
-    async findOne(@Param('id') id: string, @Req() req): Promise<Project> {
-        return await this.projectServices.findOne(+id, req.user, +req.headers.data);
+    async findOne(@Param('id') id: string, @Query() query: { withInvoice: string }, @Req() req): Promise<Project> {
+        return await this.projectServices.findOne(+id, req.user, +req.headers.data, query.withInvoice);
     }
 
     @Get('person/:id')
