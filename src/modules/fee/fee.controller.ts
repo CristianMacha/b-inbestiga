@@ -15,6 +15,11 @@ export class FeeController {
         return await this.feeServices.findByInvoice(+invoiceId, req.user);
     }
 
+    @Get('project/:id')
+    async findByProject(@Param('id') projectId: string): Promise<Fee[]> {
+        return await this.feeServices.findByProject(+projectId);
+    }
+
     @Post()
     async create(@Body() fee: Fee): Promise<Fee> {
         return await this.feeServices.create(fee);

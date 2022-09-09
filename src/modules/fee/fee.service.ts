@@ -1,11 +1,7 @@
 import {Injectable, NotFoundException,} from '@nestjs/common';
-import {getConnection} from "typeorm";
-import {nanoid} from "nanoid/async";
 
 import {Fee} from './fee.entity';
 import {FeeRepository} from './fee.repository';
-import {EFeeStatus} from "../../core/enums/fee-status.enum";
-import {EStatusPay} from "../../core/enums/status-pay.enum";
 import {Person} from "../person/person.entity";
 
 @Injectable()
@@ -20,6 +16,10 @@ export class FeeService {
 
     async findAll(): Promise<Fee[]> {
         return await this.feeRepository.find();
+    }
+
+    async findByProject(projectId: number): Promise<Fee[]> {
+        return await this.feeRepository.findByProject(projectId);
     }
 
     async findOne(feeId: number): Promise<Fee> {

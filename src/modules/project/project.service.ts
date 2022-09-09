@@ -15,7 +15,7 @@ import {PermissionService} from "../permission/permission.service";
 import {NanoidService} from "../../core/helpers/nanoid.service";
 import {EFeeStatus} from "../../core/enums/fee-status.enum";
 import {EProjectStatus} from "../../core/enums/project.enum";
-import {ProjectAcceptInterface, ProjectFilterInterface} from "../../core/interfaces/project.interface";
+import {CreateProjectInterface, ProjectAcceptInterface, ProjectFilterInterface} from "../../core/interfaces/project.interface";
 import {PersonService} from "../person/person.service";
 import {ResponseListInterface} from "../../core/interfaces/response.interface";
 import * as moment from "moment";
@@ -111,48 +111,63 @@ export class ProjectService {
         }
     }
 
-    /**
-     * Create new project
-     * @param project
-     */
-    async create(project: Project): Promise<Project> {
+    async create(createProject: CreateProjectInterface): Promise<Project> {
+        const { advisors, fees, invoice, project, students} = createProject;
         const connection = getConnection();
-        return await connection.transaction('SERIALIZABLE', async (manager) => {
-                const projectCode = await this.nanoService.gProjectCode();
-                const newProject = this.projectRepository.create(project);
-                newProject.code = projectCode;
-                newProject.status = EProjectStatus.PENDING;
-                const newProjectCreated = await manager.save(newProject);
+        const projectCreated = await connection.transaction('SERIALIZABLE', async manager => {
+            const projectCode = await this.nanoService.gProjectCode();
+            const newproject = this.projectRepository.create(project);
+            if (project.id == 0) {newproject.code = projectCode;}
+            newproject.status = EProjectStatus.PENDING;
+            const newProjectCreated = await manager.save(newproject);
 
-                for await (const invoice of project.invoices) {
-                    const newInvoice = new Invoice();
-                    newInvoice.code = await nanoid();
-                    newInvoice.total = invoice.total;
-                    newInvoice.description = invoice.description;
-                    newInvoice.expirationDate = invoice.expirationDate;
-                    newInvoice.feesNumber = invoice.feesNumber;
-                    newInvoice.project = newProjectCreated;
-                    const newInvoiceCreated = await manager.save(newInvoice);
+            const newInvoice = new Invoice();
+            newInvoice.id = invoice.id;
+            if(invoice.id == 0) {newInvoice.code = await nanoid();}
+            newInvoice.total = invoice.total;
+            newInvoice.description = invoice.description;
+            newInvoice.expirationDate = project.expirationDate;
+            newInvoice.feesNumber = invoice.feesNumber;
+            newInvoice.project = newProjectCreated;
+            const newInvoiceCreated = await manager.save(newInvoice);
 
-                    const newFees = this.generateFees(newInvoiceCreated.feesNumber, newInvoiceCreated.total);
-                    for await (const fee of newFees) {
-                        fee.invoice = newInvoiceCreated;
-                        await manager.save(fee);
-                    }
-                }
+            for await (const fee of fees) {
+                const newFee = new Fee();
+                newFee.id = fee.id;
+                newFee.total = fee.total;
+                newFee.invoice = newInvoiceCreated;
+                newFee.paymentDate = fee.paymentDate;
+                newFee.status = EFeeStatus.DEBT;
 
-                for await (const personProject of project.personProjects) {
-                    const newMember = new PersonProject();
-                    newMember.person = personProject.person;
-                    newMember.project = newProjectCreated;
-                    newMember.isAdvisor = personProject.isAdvisor;
+                await manager.save(newFee);
+            }
 
-                    await manager.save(newMember);
-                }
+            for await (const advisor of advisors) {
+                const newAdvisor = new PersonProject();
+                newAdvisor.id = advisor.id;
+                newAdvisor.active = advisor.active;
+                newAdvisor.person = advisor.person;
+                newAdvisor.project = newProjectCreated;
+                newAdvisor.isAdvisor = true;
 
-                return newProjectCreated;
-            },
-        );
+                await manager.save(newAdvisor);
+            }
+
+            for await (const student of students) {
+                const newStudent = new PersonProject();
+                newStudent.id = student.id;
+                newStudent.active = student.active;
+                newStudent.person = student.person;
+                newStudent.project = newProjectCreated;
+                newStudent.isAdvisor = false;
+
+                await manager.save(newStudent);
+            }
+
+            return newProjectCreated;
+        });
+
+        return projectCreated;
     }
 
     /**

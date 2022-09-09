@@ -14,7 +14,7 @@ import {
 import { JwtAuthGuard } from '../../core/guards/jwt-auth.guard';
 import { Project } from './project.entity';
 import { ProjectService } from './project.service';
-import { ProjectAcceptInterface, ProjectFilterInterface } from "../../core/interfaces/project.interface";
+import { CreateProjectInterface, ProjectAcceptInterface, ProjectFilterInterface } from "../../core/interfaces/project.interface";
 import { ResponseListInterface } from "../../core/interfaces/response.interface";
 
 @Controller('project')
@@ -34,8 +34,8 @@ export class ProjectController {
 
     @UseGuards(JwtAuthGuard)
     @Post()
-    async create(@Body() project: Project): Promise<Project> {
-        return await this.projectServices.create(project);
+    async create(@Body() projectCreate: CreateProjectInterface): Promise<Project> {
+        return await this.projectServices.create(projectCreate);
     }
 
     @UseGuards(JwtAuthGuard)

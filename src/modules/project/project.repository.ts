@@ -68,8 +68,6 @@ export class ProjectRepository extends Repository<Project> {
             .innerJoinAndSelect('project.category', 'category')
 
         if (withInvoice === 'true') {
-            console.log(withInvoice);
-            
             query.innerJoinAndSelect('project.invoices', 'invoice');
         }
         query.where('project.id=:projectId', { projectId });
