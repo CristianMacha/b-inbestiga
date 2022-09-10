@@ -7,6 +7,10 @@ export class CategoryService {
     constructor(private categoryRepository: CategoryRepository) {
     }
 
+    async findOne(categoryId: number): Promise<Category> {
+        return await this.categoryRepository.findOne(categoryId);
+    }
+
     async findAllActive(): Promise<Category[]> {
         return await this.categoryRepository.find({
             where: {active: true}

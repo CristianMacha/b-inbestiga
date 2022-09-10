@@ -12,6 +12,11 @@ export class CategoryController {
         return this.categoryService.findAllActive();
     }
 
+    @Get('one/:id')
+    findOne(@Param('id') categoryId: string): Promise<Category> {
+        return this.categoryService.findOne(+categoryId);
+    }
+
     @Post()
     async create(@Body() category: Category): Promise<Category> {
         return await this.categoryService.create(category);
