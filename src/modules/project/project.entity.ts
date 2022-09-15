@@ -2,10 +2,8 @@ import {
     Column,
     CreateDateColumn,
     Entity,
-    JoinColumn,
     ManyToOne,
     OneToMany,
-    OneToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
@@ -43,6 +41,9 @@ export class Project {
 
     @Column({type: 'enum', enum: EProjectStatus, default: EProjectStatus.ACCEPTED})
     status: EProjectStatus;
+
+    @Column({type: 'date', nullable: true})
+    startDate: Date;
 
     @Column({type: 'date', nullable: true})
     expirationDate: Date;

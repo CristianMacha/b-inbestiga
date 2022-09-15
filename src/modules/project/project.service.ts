@@ -254,15 +254,6 @@ export class ProjectService {
                     const projectDb = await this.projectRepository.preload(project);
                     const projectDbUpdated = await manager.save(projectDb);
 
-                    for await (const invoice of project.invoices) {
-                        const invoiceDb = await this.invoiceService.findOne(invoice.id);
-                        if (!invoiceDb) {
-                            throw new NotFoundException('Invoice not found.');
-                        }
-                        invoiceDb.total = invoice.total;
-                        await manager.save(invoiceDb);
-                    }
-
                     for await (const personProject of project.personProjects) {
                         const personProjectDb = await this.personProjectService.findOne(
                             personProject.id,
