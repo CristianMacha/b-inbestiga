@@ -22,7 +22,7 @@ export class PaymentEntity {
     @Column({type: 'enum', enum: PaymentMethodEnum, default: null})
     paymentMethod: PaymentMethodEnum;
 
-    @Column({type: 'enum', enum: PaymentStatusEnum, default: PaymentStatusEnum.PENDING})
+    @Column({type: 'enum', enum: PaymentStatusEnum, default: PaymentStatusEnum.PROCESSING})
     status: PaymentStatusEnum;
 
     @Column({nullable: false, default: true})

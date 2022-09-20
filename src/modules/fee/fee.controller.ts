@@ -1,12 +1,17 @@
-import {Body, Controller, Get, Param, Post, Put, Req, UseGuards} from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Put, Req, UseGuards } from '@nestjs/common';
 
-import {Fee} from './fee.entity';
-import {FeeService} from './fee.service';
-import {JwtAuthGuard} from "../../core/guards/jwt-auth.guard";
+import { Fee } from './fee.entity';
+import { FeeService } from './fee.service';
+import { JwtAuthGuard } from "../../core/guards/jwt-auth.guard";
 
 @Controller('fee')
 export class FeeController {
     constructor(private feeServices: FeeService) {
+    }
+
+    @Patch('total/:id')
+    async updateTotal(@Param('id') feeId: number, @Body() body: { total: number }): Promise<Fee> {
+        return await this.feeServices.updateTotal(feeId, body.total);
     }
 
     @UseGuards(JwtAuthGuard)

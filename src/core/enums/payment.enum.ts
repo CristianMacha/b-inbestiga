@@ -11,7 +11,7 @@ export enum PaymentMethodEnum {
 }
 
 export enum PaymentStatusEnum {
-    PENDING = 'PENDIENTE',
+    PROCESSING = 'PROCESANDO',
     VERIFIED = 'VERIFICADO',
     REFUSED = 'RECHAZADO',
 }

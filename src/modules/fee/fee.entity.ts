@@ -21,7 +21,7 @@ export class Fee {
         nullable: false,
         type: 'enum',
         enum: EFeeStatus,
-        default: EFeeStatus.DEBT,
+        default: EFeeStatus.PENDING,
     })
     status: EFeeStatus;
 

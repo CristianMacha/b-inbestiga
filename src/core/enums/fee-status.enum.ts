@@ -1,5 +1,5 @@
 export enum EFeeStatus {
-    DEBT = 'DEUDA',
+    PENDING = 'PENDIENTE',
     PAID_OUT = 'PAGADO',
     PARTIAL = 'PARCIAL',
 }

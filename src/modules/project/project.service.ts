@@ -1,6 +1,7 @@
 import {BadRequestException, ForbiddenException, Injectable, NotFoundException} from '@nestjs/common';
 import {getConnection} from 'typeorm';
 import {nanoid} from "nanoid/async";
+import * as moment from "moment";
 
 import {Invoice} from '../invoice/invoice.entity';
 import {InvoiceService} from '../invoice/invoice.service';
@@ -18,7 +19,6 @@ import {EProjectStatus} from "../../core/enums/project.enum";
 import {CreateProjectInterface, ProjectAcceptInterface, ProjectFilterInterface} from "../../core/interfaces/project.interface";
 import {PersonService} from "../person/person.service";
 import {ResponseListInterface} from "../../core/interfaces/response.interface";
-import * as moment from "moment";
 
 @Injectable()
 export class ProjectService {
@@ -137,7 +137,7 @@ export class ProjectService {
                 newFee.total = fee.total;
                 newFee.invoice = newInvoiceCreated;
                 newFee.paymentDate = fee.paymentDate;
-                newFee.status = EFeeStatus.DEBT;
+                newFee.status = EFeeStatus.PENDING;
 
                 await manager.save(newFee);
             }
@@ -287,7 +287,7 @@ export class ProjectService {
         for (let i = 0; i < feeCount; i++) {
             const feeTemp = new Fee();
             feeTemp.total = feePrice;
-            feeTemp.status = EFeeStatus.DEBT;
+            feeTemp.status = EFeeStatus.PENDING;
             feeTemp.paymentDate = currentDate.add(1, 'month').toDate();
 
             feesTemp.push(feeTemp);

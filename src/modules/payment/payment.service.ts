@@ -1,21 +1,21 @@
-import {ForbiddenException, Injectable, NotFoundException} from '@nestjs/common';
-import {nanoid} from "nanoid/async";
-import {getConnection, Not} from "typeorm";
-import {PaymentRepository} from "./payment.repository";
-import {PaymentEntity} from "./payment.entity";
-import {PaymentCreateInterface} from "../../core/interfaces/payment.interface";
-import {FeeService} from "../fee/fee.service";
-import {Person} from "../person/person.entity";
-import {PaymentConceptEnum, PaymentStatusEnum} from "../../core/enums/payment.enum";
-import {EFeeStatus} from "../../core/enums/fee-status.enum";
-import {InvoiceStatusEnum} from "../../core/enums/invoice.enum";
-import {ERole} from "../../core/enums/role.enum";
+import { ForbiddenException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { getConnection, Not } from "typeorm";
+import { PaymentRepository } from "./payment.repository";
+import { PaymentEntity } from "./payment.entity";
+import { PaymentCreateInterface } from "../../core/interfaces/payment.interface";
+import { FeeService } from "../fee/fee.service";
+import { Person } from "../person/person.entity";
+import { PaymentConceptEnum, PaymentStatusEnum } from "../../core/enums/payment.enum";
+import { EFeeStatus } from "../../core/enums/fee-status.enum";
+import { InvoiceStatusEnum } from "../../core/enums/invoice.enum";
+import { ERole } from "../../core/enums/role.enum";
 import { NanoidService } from '../../core/helpers/nanoid.service';
 
 @Injectable()
 export class PaymentService {
     constructor(
         private paymentRepository: PaymentRepository,
+        @Inject(forwardRef(() => FeeService))
         private feeServices: FeeService,
         private nanoid: NanoidService
     ) {
@@ -35,6 +35,11 @@ export class PaymentService {
                 deleted: false,
             }
         });
+    }
+
+    async totalPaidOutFee(conceptId: number): Promise<number | null> {
+        const totalPaidOut = await this.paymentRepository.totalPaidOutFee(conceptId);
+        return totalPaidOut;
     }
 
     /**
@@ -80,7 +85,8 @@ export class PaymentService {
             if (approve) {
                 const paymentsDb = await this.findFeePaymentsVerify(paymentDb.conceptId);
                 const totalPaidOut = this.sumTotalPayments(paymentsDb);
-                if (feeDb.total <= totalPaidOut + paymentDb.amount) {
+                const newTotal = totalPaidOut + paymentDb.amount;
+                if (feeDb.total <= newTotal) {
                     feeDb.status = EFeeStatus.PAID_OUT;
                 } else {
                     feeDb.status = EFeeStatus.PARTIAL;
@@ -141,7 +147,7 @@ export class PaymentService {
         const connection = getConnection();
         return await connection.transaction('SERIALIZABLE', async manager => {
             paymentDb.amount = amount;
-            if (paymentDb.status == PaymentStatusEnum.PENDING) {
+            if (paymentDb.status == PaymentStatusEnum.PROCESSING) {
                 return await manager.save(paymentDb);
             }
             if (paymentDb.status == PaymentStatusEnum.VERIFIED) {

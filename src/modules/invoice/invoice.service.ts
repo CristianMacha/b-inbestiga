@@ -122,7 +122,7 @@ export class InvoiceService {
 
             for await (const fee of feesDb) {
                 fee.total = newFeePrice;
-                fee.status = EFeeStatus.DEBT;
+                fee.status = EFeeStatus.PENDING;
 
                 await manager.save(fee);
             }
