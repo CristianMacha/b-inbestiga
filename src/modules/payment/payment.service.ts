@@ -1,4 +1,4 @@
-import { ForbiddenException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadGatewayException, ForbiddenException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { getConnection, Not } from "typeorm";
 import { PaymentRepository } from "./payment.repository";
 import { PaymentEntity } from "./payment.entity";
@@ -71,6 +71,10 @@ export class PaymentService {
                 deleted: false,
             }
         });
+
+        if(paymentDb.status != PaymentStatusEnum.PROCESSING) {
+            throw new BadGatewayException(`Error al ${approve ? 'verificar' : 'rechazar'} pago.`);
+        }
         if (!paymentDb) {
             throw new NotFoundException('Payment not found.');
         }
