@@ -76,7 +76,6 @@ export class ProjectRepository extends Repository<Project> {
             //query.andWhere('person.id=:personId', {personId: person.id});
         }
 
-        query.andWhere('project.active=true');
         query.andWhere('project.deleted=false');
 
         return await query.getOne();
