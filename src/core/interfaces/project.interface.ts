@@ -23,4 +23,5 @@ export interface ProjectAcceptInterface {
     feesNumber: number;
     expirationDate: Date;
     advisorId: number;
+    fees: Fee[];
 }

@@ -58,10 +58,13 @@ export class ProjectService {
             newInvoice.expirationDate = projectUpdated.expirationDate;
             const invoiceCreated = await manager.save(newInvoice);
 
-            const fees = this.generateFees(invoiceCreated.feesNumber, invoiceCreated.total);
-            for await (const fee of fees) {
-                fee.invoice = invoiceCreated;
-                await manager.save(fee);
+            for await (const fee of projectAccept.fees) {
+                const newFee = new Fee();
+                newFee.paymentDate = fee.paymentDate;
+                newFee.total = fee.total;
+                newFee.invoice = invoiceCreated;
+                newFee.status = EFeeStatus.PENDING;
+                await manager.save(newFee);
             }
 
             const newPersonProject = new PersonProject();
