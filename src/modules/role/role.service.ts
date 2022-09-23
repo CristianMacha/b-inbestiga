@@ -4,8 +4,8 @@ import {
     NotFoundException,
 } from '@nestjs/common';
 
-import {Role} from './role.entity';
-import {RoleRepository} from './role.repository';
+import { Role } from './role.entity';
+import { RoleRepository } from './role.repository';
 
 @Injectable()
 export class RoleService {
@@ -26,14 +26,14 @@ export class RoleService {
 
     async findOne(roleId: number): Promise<Role> {
         const roleDb = await this.roleRepository.findOne(roleId, {
-            where: {active: true},
+            where: { active: true },
         });
         return roleDb;
     }
 
     async findAll(): Promise<Role[]> {
         const listRole = await this.roleRepository.find({
-            where: {active: true},
+            where: { active: true },
         });
         return listRole;
     }

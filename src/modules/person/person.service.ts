@@ -119,6 +119,17 @@ export class PersonService {
             async (manager) => {
                 const updatePerson = await manager.save(personDb);
                 await manager.save(personRoleDb);
+
+                for await (const personRole of person.personRoles) {
+                    const newPersonRole = new PersonRole();
+                    newPersonRole.id = personRole.id;
+                    newPersonRole.role = personRole.role;
+                    newPersonRole.active = personRole.active;
+                    newPersonRole.person = updatePerson;
+
+                    await manager.save(newPersonRole);
+                }
+
                 return updatePerson;
             },
         );
