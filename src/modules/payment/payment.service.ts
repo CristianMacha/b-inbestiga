@@ -1,4 +1,4 @@
-import { BadGatewayException, ForbiddenException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadGatewayException, BadRequestException, ForbiddenException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { getConnection, Not } from "typeorm";
 import { PaymentRepository } from "./payment.repository";
 import { PaymentEntity } from "./payment.entity";
@@ -33,7 +33,7 @@ export class PaymentService {
                 concept: concept,
                 active: true,
                 deleted: false,
-            }
+            },
         });
     }
 
@@ -52,6 +52,8 @@ export class PaymentService {
         if (!fee || !fee.active) {
             throw new NotFoundException('Fee not found')
         }
+
+        if(fee.status == EFeeStatus.PAID_OUT) { throw new BadRequestException('No se puede registrar su pago.') }
 
         const newPayment = this.paymentRepository.create();
         newPayment.amount = paymentCreate.amount;
