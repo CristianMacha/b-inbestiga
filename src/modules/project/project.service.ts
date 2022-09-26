@@ -39,6 +39,8 @@ export class ProjectService {
      */
     async accept(projectAccept: ProjectAcceptInterface): Promise<Project> {
         const projectDb = await this.projectRepository.findOne(projectAccept.projectId);
+        if(!projectDb) { throw new NotFoundException('Project not found.') }
+        if(projectDb.status == EProjectStatus.ACCEPTED) { throw new BadRequestException() }
         const advisorDb = await this.personService.findOne(projectAccept.advisorId);
         if (!advisorDb) {
             throw new NotFoundException('Person not found.')
