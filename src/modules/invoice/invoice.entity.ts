@@ -7,9 +7,9 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-import {Fee} from '../fee/fee.entity';
-import {Project} from '../project/project.entity';
-import {InvoiceStatusEnum} from "../../core/enums/invoice.enum";
+import { Fee } from '../fee/fee.entity';
+import { Project } from '../project/project.entity';
+import { InvoiceStatusEnum } from "../../core/enums/invoice.enum";
 
 @Entity()
 export class Invoice {
@@ -22,7 +22,10 @@ export class Invoice {
     @Column()
     total: number;
 
-    @Column({nullable: false, default: 1})
+    @Column({ default: 0 })
+    feesPaidOut: number;
+
+    @Column({ nullable: false, default: 1 })
     feesNumber: number;
 
     @Column({
@@ -33,10 +36,10 @@ export class Invoice {
     })
     status: InvoiceStatusEnum;
 
-    @Column({nullable: true})
+    @Column({ nullable: true })
     description: string;
 
-    @Column({nullable: false, default: true})
+    @Column({ nullable: false, default: true })
     active: boolean;
 
     @Column()
@@ -48,7 +51,7 @@ export class Invoice {
     @UpdateDateColumn()
     updatedAt: Date;
 
-    @ManyToOne(() => Project, (project) => project.invoices, {nullable: false})
+    @ManyToOne(() => Project, (project) => project.invoices, { nullable: false })
     project: Project;
 
     @OneToMany(() => Fee, (fee) => fee.invoice)

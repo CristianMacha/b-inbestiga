@@ -53,7 +53,7 @@ export class PaymentService {
             throw new NotFoundException('Fee not found')
         }
 
-        if(fee.status == EFeeStatus.PAID_OUT) { throw new BadRequestException('No se puede registrar su pago.') }
+        if (fee.status == EFeeStatus.PAID_OUT) { throw new BadRequestException('No se puede registrar su pago.') }
 
         const newPayment = this.paymentRepository.create();
         newPayment.amount = paymentCreate.amount;
@@ -74,7 +74,7 @@ export class PaymentService {
             }
         });
 
-        if(paymentDb.status != PaymentStatusEnum.PROCESSING) {
+        if (paymentDb.status != PaymentStatusEnum.PROCESSING) {
             throw new BadGatewayException(`Error al ${approve ? 'verificar' : 'rechazar'} pago.`);
         }
         if (!paymentDb) {
@@ -85,6 +85,7 @@ export class PaymentService {
         if (!feeDb) {
             throw new NotFoundException('Fee not found.');
         }
+        const invoiceDb = feeDb.invoice;
 
         const connection = getConnection();
         return await connection.transaction('SERIALIZABLE', async manager => {
@@ -99,11 +100,8 @@ export class PaymentService {
                 }
 
                 paymentDb.status = PaymentStatusEnum.VERIFIED;
-            } else {
-                paymentDb.status = PaymentStatusEnum.REFUSED;
             }
 
-            const invoiceDb = feeDb.invoice;
             const paymentsByInvoice = await this.paymentRepository.findByInvoice(invoiceDb.id);
             let totalPaidOut = 0;
             paymentsByInvoice.forEach((payment) => {
@@ -113,6 +111,7 @@ export class PaymentService {
             });
 
             if (invoiceDb.total <= (totalPaidOut + paymentDb.amount)) {
+                invoiceDb.feesPaidOut += 1;
                 invoiceDb.status = InvoiceStatusEnum.PAID_OUT;
             } else {
                 invoiceDb.status = InvoiceStatusEnum.PARTIAL;
@@ -122,6 +121,145 @@ export class PaymentService {
             await manager.save(feeDb);
             return await manager.save(paymentDb);
         });
+    }
+
+    async verifyPaymentFee(paymentId: number) {
+        const payment = await this.paymentRepository.findOne(paymentId, {
+            relations: ['person'],
+            where: { active: true, deleted: false }
+        });
+        if (payment.status != PaymentStatusEnum.PROCESSING) { throw new BadRequestException() }
+
+        const fee = await this.feeServices.findOne(payment.conceptId);
+        if (!fee) { throw new NotFoundException('Resource not found.') }
+
+        const { invoice } = fee;
+
+        const connection = getConnection();
+        return await connection.transaction('SERIALIZABLE', async manager => {
+            const paymentsFeePaidOut = await this.findFeePaymentsVerify(payment.conceptId);
+            const paymentTotalFeePaidOut = this.sumTotalPayments(paymentsFeePaidOut);
+            const paymentInvoicePaidOut = await this.findAllByInvoice(invoice.id);
+
+            const amount = payment.amount;
+            const debtFee = fee.total - paymentTotalFeePaidOut;
+            const debtInvoice = invoice.total - this.sumTotalPayments(paymentInvoicePaidOut);
+
+            if (debtInvoice < amount) { throw new BadRequestException() }
+
+            if (debtFee > amount) {
+                fee.status = EFeeStatus.PARTIAL;
+                payment.status = PaymentStatusEnum.VERIFIED;
+
+                await manager.save(fee);
+                await manager.save(payment);
+            }
+
+            if (debtFee == amount) {
+                fee.status = EFeeStatus.PAID_OUT;
+                invoice.feesPaidOut += 1;
+                invoice.status = InvoiceStatusEnum.PARTIAL;
+                payment.status = PaymentStatusEnum.VERIFIED;
+
+                await manager.save(fee);
+                await manager.save(invoice);
+                await manager.save(payment);
+            }
+
+            if (amount > debtFee) {
+                fee.status = EFeeStatus.PAID_OUT;
+                invoice.feesPaidOut += 1;
+                invoice.status = InvoiceStatusEnum.PARTIAL;
+                payment.status = PaymentStatusEnum.VERIFIED;
+                payment.amount = debtFee;
+
+                await manager.save(fee);
+                await manager.save(invoice);
+                await manager.save(payment);
+
+                const feesToInvoice = await this.feeServices.findFeeOrderByNumberFee(invoice.id);
+                const feesToInvoiceFiltered = feesToInvoice.filter((f) => f.id != fee.id);
+                let remainingAmount = amount - debtFee;
+
+                for await (const feeToInvoice of feesToInvoiceFiltered) {
+                    const paymentsFeeToInvoicePaidOut = await this.findFeePaymentsVerify(feeToInvoice.id);
+                    const paymentTotalFeeToInvoice = this.sumTotalPayments(paymentsFeeToInvoicePaidOut);
+                    const debtFeeToInvoice = feeToInvoice.total - paymentTotalFeeToInvoice;
+
+                    if (debtFeeToInvoice > remainingAmount) {
+                        feeToInvoice.status = EFeeStatus.PARTIAL;
+                        const newPayment = new PaymentEntity();
+                        newPayment.status = PaymentStatusEnum.VERIFIED;
+                        newPayment.amount = remainingAmount;
+                        newPayment.code = payment.code;
+                        newPayment.concept = PaymentConceptEnum.FEE;
+                        newPayment.conceptId = feeToInvoice.id;
+                        newPayment.paymentMethod = payment.paymentMethod;
+                        newPayment.person = payment.person;
+
+                        await manager.save(feeToInvoice);
+                        await manager.save(newPayment);
+                        break;
+                    }
+
+                    if (debtFeeToInvoice == remainingAmount) {
+                        feeToInvoice.status = EFeeStatus.PAID_OUT;
+                        const newPayment = new PaymentEntity();
+                        newPayment.status = PaymentStatusEnum.VERIFIED;
+                        newPayment.amount = remainingAmount;
+                        newPayment.code = payment.code;
+                        newPayment.concept = PaymentConceptEnum.FEE;
+                        newPayment.conceptId = feeToInvoice.id;
+                        newPayment.paymentMethod = payment.paymentMethod;
+                        newPayment.person = payment.person;
+
+                        invoice.feesPaidOut += 1;
+                        invoice.status = InvoiceStatusEnum.PARTIAL;
+                        await manager.save(invoice);
+                        await manager.save(feeToInvoice);
+                        await manager.save(newPayment);
+                        break;
+                    }
+
+                    if (debtFeeToInvoice < remainingAmount) {
+                        feeToInvoice.status = EFeeStatus.PAID_OUT;
+                        const newPayment = new PaymentEntity();
+                        newPayment.status = PaymentStatusEnum.VERIFIED;
+                        newPayment.amount = debtFeeToInvoice;
+                        newPayment.code = payment.code;
+                        newPayment.concept = PaymentConceptEnum.FEE;
+                        newPayment.conceptId = feeToInvoice.id;
+                        newPayment.paymentMethod = payment.paymentMethod;
+                        newPayment.person = payment.person;
+
+                        invoice.feesPaidOut += 1;
+                        invoice.status = InvoiceStatusEnum.PARTIAL;
+                        await manager.save(invoice);
+                        await manager.save(feeToInvoice);
+                        await manager.save(newPayment);
+
+                        remainingAmount = remainingAmount - debtFeeToInvoice;
+                    }
+                }
+
+            }
+
+            if (debtInvoice - amount == 0) {
+                invoice.status = InvoiceStatusEnum.PAID_OUT;
+                await manager.save(invoice);
+            }
+
+            return { paymentVerify: payment.amount }
+        });
+    }
+
+    async refusePaymentFee(paymentId: number) {
+        const payment = await this.paymentRepository.findOne(paymentId, {
+            where: { active: true, deleted: false }
+        });
+
+        payment.status = PaymentStatusEnum.REFUSED;
+        return await this.paymentRepository.save(payment);
     }
 
     async findAllByInvoice(invoiceId: number, paymentIngnore?: number): Promise<PaymentEntity[]> {
@@ -192,7 +330,7 @@ export class PaymentService {
         });
     }
 
-    async update(paymentId: number, payment: PaymentEntity): Promise<PaymentEntity> {
+    async updatePaymentFee(paymentId: number, payment: PaymentEntity): Promise<PaymentEntity> {
         const paymentDb = await this.paymentRepository.findOne(paymentId, {
             where: {
                 active: true,
@@ -200,7 +338,29 @@ export class PaymentService {
             }
         });
 
-        paymentDb.amount = payment.amount;
+        if (paymentDb.status == PaymentStatusEnum.PROCESSING) {
+            paymentDb.amount = payment.amount;
+        }
+
+        if (paymentDb.status == PaymentStatusEnum.REFUSED) {
+            paymentDb.amount = payment.amount;
+            paymentDb.status = PaymentStatusEnum.PROCESSING;
+        }
+
+        if(paymentDb.status == PaymentStatusEnum.VERIFIED) {
+            const fee = await this.feeServices.findOne(paymentDb.conceptId);
+            const { invoice } = fee;
+
+            if(payment.amount > fee.total) { throw new BadRequestException() }
+
+            if(fee.status == EFeeStatus.PAID_OUT) {
+                const paymentsByFee = await this.findByConcept(fee.id, PaymentConceptEnum.FEE);
+                if(paymentsByFee.length > 0) {
+                    
+                }
+            }
+        }
+
         return await this.paymentRepository.save(paymentDb);
     }
 

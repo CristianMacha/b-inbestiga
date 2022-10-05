@@ -17,6 +17,9 @@ export class Fee {
     @Column({nullable: false})
     total: number;
 
+    @Column({default: 0})
+    numberFee: number;
+
     @Column({
         nullable: false,
         type: 'enum',

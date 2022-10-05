@@ -32,9 +32,16 @@ export class PaymentController {
         return this.paymentService.createPaymentFee(paymentCreate, req.user);
     }
 
-    @Post('approve/fee')
-    approvePaymentFee(@Body() body: { paymentId: number, approve: boolean }): Promise<PaymentEntity> {
-        return this.paymentService.approvePaymentFee(body.paymentId, body.approve);
+    @UseGuards(JwtAuthGuard)
+    @Get('refuse/fee/:id')
+    refusePaymentFee(@Param('id') paymentId: string) {
+        return this.paymentService.refusePaymentFee(+paymentId);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get('verify/fee/:id')
+    vaerufyPaymentFee(@Param('id') paymentId: string) {
+        return this.paymentService.verifyPaymentFee(+paymentId);
     }
 
     @UseGuards(JwtAuthGuard)
@@ -46,6 +53,6 @@ export class PaymentController {
     @UseGuards(JwtAuthGuard)
     @Put(':id')
     update(@Param('id') paymentId: string, @Body() payment: PaymentEntity): Promise<PaymentEntity> {
-        return this.paymentService.update(+paymentId, payment);
+        return this.paymentService.updatePaymentFee(+paymentId, payment);
     }
 }

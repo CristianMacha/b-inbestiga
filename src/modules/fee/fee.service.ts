@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException, } from '@nestjs/common';
-import { getConnection } from 'typeorm';
+import { getConnection, Not } from 'typeorm';
 
 import { Fee } from './fee.entity';
 import { FeeRepository } from './fee.repository';
@@ -7,6 +7,7 @@ import { Person } from "../person/person.entity";
 import { PaymentService } from '../payment/payment.service';
 import { InvoiceStatusEnum } from '../../core/enums/invoice.enum';
 import { EFeeStatus } from '../../core/enums/fee-status.enum';
+import { PaymentStatusEnum } from 'src/core/enums/payment.enum';
 
 @Injectable()
 export class FeeService {
@@ -58,12 +59,26 @@ export class FeeService {
                 active: true,
             },
         });
+        const invoice = feeDb.invoice;
         if (!feeDb) { throw new NotFoundException('Fee not found.') }
 
         const totalPaidOut = await this.paymentService.totalPaidOutFee(feeDb.id);
-        if (total <= totalPaidOut) { throw new BadRequestException('El total debe ser mayor que el monto pagado. ') }
+        
+        const invoiceTotalPaidOut = await this.paymentService.findAllByInvoice(invoice.id);
+        let totalInvoicePaidOut = 0;
+        invoiceTotalPaidOut.forEach((pi) => {
+            if(pi.status == PaymentStatusEnum.VERIFIED) {
+                totalInvoicePaidOut += pi.amount;
+            }
+        })
+        console.log(totalInvoicePaidOut);
+        
+        if (total < totalPaidOut) { throw new BadRequestException('El total debe ser mayor que el monto pagado. ') }
+        if (total == totalPaidOut) { 
+            feeDb.status = EFeeStatus.PAID_OUT;
 
-        const invoice = feeDb.invoice;
+        }
+
         const connection = getConnection();
         const feeUpdated = await connection.transaction('SERIALIZABLE', async manager => {
             const isIncreasing = (total > feeDb.total);
@@ -71,13 +86,18 @@ export class FeeService {
                 const amountExtra = total - feeDb.total;
                 invoice.total += amountExtra;
 
-                if(totalPaidOut > 0) {
+                if (totalPaidOut > 0) {
                     invoice.status = InvoiceStatusEnum.PARTIAL;
+                    invoice.feesPaidOut -= 1;
                     feeDb.status = EFeeStatus.PARTIAL;
                 }
 
+                
                 feeDb.total += amountExtra;
             } else {
+                if(totalInvoicePaidOut == invoice.total) {
+                    invoice.status = InvoiceStatusEnum.PAID_OUT;
+                }
                 const amountDiscounted = feeDb.total - total;
                 invoice.total -= amountDiscounted;
                 feeDb.total -= amountDiscounted;
@@ -88,5 +108,18 @@ export class FeeService {
         });
 
         return feeUpdated;
+    }
+
+    async findFeeOrderByNumberFee(invoiceId: number, status: EFeeStatus = EFeeStatus.PAID_OUT) {
+        const fees = await this.feeRepository.find({
+            where: {
+                invoice: { id: invoiceId },
+                active: true,
+                status: Not(status)
+            },
+            order: { numberFee: 'ASC' }
+        })
+
+        return fees;
     }
 }
