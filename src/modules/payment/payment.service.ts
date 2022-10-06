@@ -150,7 +150,9 @@ export class PaymentService {
             if (debtFee > amount) {
                 fee.status = EFeeStatus.PARTIAL;
                 payment.status = PaymentStatusEnum.VERIFIED;
+                invoice.status = InvoiceStatusEnum.PARTIAL;
 
+                await manager.save(invoice);
                 await manager.save(fee);
                 await manager.save(payment);
             }

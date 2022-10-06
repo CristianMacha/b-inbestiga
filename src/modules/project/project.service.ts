@@ -138,6 +138,7 @@ export class ProjectService {
 
             for await (const fee of fees) {
                 const newFee = new Fee();
+                newFee.numberFee = fee.numberFee;
                 newFee.id = fee.id;
                 newFee.total = fee.total;
                 newFee.invoice = newInvoiceCreated;

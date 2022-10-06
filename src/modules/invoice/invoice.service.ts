@@ -8,9 +8,7 @@ import {PersonRoleService} from "../person-role/person-role.service";
 import {PermissionService} from "../permission/permission.service";
 import {InvoiceFilterInterface} from "../../core/interfaces/invoice.interface";
 import {ResponseListInterface} from "../../core/interfaces/response.interface";
-import {FeeService} from "../fee/fee.service";
 import {InvoiceStatusEnum} from "../../core/enums/invoice.enum";
-import {EFeeStatus} from "../../core/enums/fee-status.enum";
 
 @Injectable()
 export class InvoiceService {
@@ -18,7 +16,6 @@ export class InvoiceService {
         private invoiceRepository: InvoiceRepository,
         private personRoleService: PersonRoleService,
         private permissionService: PermissionService,
-        private feeServices: FeeService,
     ) {
     }
 
@@ -113,21 +110,8 @@ export class InvoiceService {
             throw new BadRequestException('No puede editar el precio total.')
         }
 
-        const connection = getConnection();
-        return await connection.transaction('SERIALIZABLE', async manager => {
-            invoice.total = total;
-            invoice.status = InvoiceStatusEnum.PENDING;
-            const feesDb = invoice.fees;
-            const newFeePrice = Math.ceil((invoice.total / invoice.feesNumber));
-
-            for await (const fee of feesDb) {
-                fee.total = newFeePrice;
-                fee.status = EFeeStatus.PENDING;
-
-                await manager.save(fee);
-            }
-
-            return await manager.save(invoice);
-        });
+        invoice.status = InvoiceStatusEnum.PARTIAL;
+        invoice.total = total;
+        return await this.invoiceRepository.save(invoice);
     }
 }

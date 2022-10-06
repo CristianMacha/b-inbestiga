@@ -10,8 +10,8 @@ export class FeeController {
     }
 
     @Patch('total/:id')
-    async updateTotal(@Param('id') feeId: number, @Body() body: { total: number }): Promise<Fee> {
-        return await this.feeServices.updateTotal(feeId, body.total);
+    async updateTotal(@Param('id') feeId: number, @Body() body: { total: number, paymentDate: Date, numberFee: number }): Promise<Fee> {
+        return await this.feeServices.updateTotal(feeId, body);
     }
 
     @UseGuards(JwtAuthGuard)
@@ -25,9 +25,12 @@ export class FeeController {
         return await this.feeServices.findByProject(+projectId);
     }
 
-    @Post()
-    async create(@Body() fee: Fee): Promise<Fee> {
-        return await this.feeServices.create(fee);
+    @Post('invoice/:id')
+    async create(
+        @Param('id') invoiceId: string,
+        @Body() fee: Fee,
+    ): Promise<Fee> {
+        return await this.feeServices.create(+invoiceId, fee);
     }
 
     @Get()
