@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException, } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable, NotFoundException, } from '@nestjs/common';
 import { getConnection, Not } from 'typeorm';
 
 import { Fee } from './fee.entity';
@@ -14,7 +14,9 @@ import { InvoiceService } from '../invoice/invoice.service';
 export class FeeService {
     constructor(
         private feeRepository: FeeRepository,
+        @Inject(forwardRef(() => PaymentService))
         private paymentService: PaymentService,
+        @Inject(forwardRef(() => InvoiceService))
         private invoiceService: InvoiceService,
     ) {
     }

@@ -1,5 +1,4 @@
 import {BadRequestException, ForbiddenException, Injectable, NotFoundException,} from '@nestjs/common';
-import {getConnection} from "typeorm";
 
 import {Invoice} from './invoice.entity';
 import {InvoiceRepository} from './invoice.repository';
@@ -9,6 +8,8 @@ import {PermissionService} from "../permission/permission.service";
 import {InvoiceFilterInterface} from "../../core/interfaces/invoice.interface";
 import {ResponseListInterface} from "../../core/interfaces/response.interface";
 import {InvoiceStatusEnum} from "../../core/enums/invoice.enum";
+import { PaymentService } from '../payment/payment.service';
+import { PaymentStatusEnum } from 'src/core/enums/payment.enum';
 
 @Injectable()
 export class InvoiceService {
@@ -16,6 +17,7 @@ export class InvoiceService {
         private invoiceRepository: InvoiceRepository,
         private personRoleService: PersonRoleService,
         private permissionService: PermissionService,
+        private paymentService: PaymentService,
     ) {
     }
 
@@ -102,11 +104,20 @@ export class InvoiceService {
             relations: ['fees'],
             where: {active: true}
         });
+
+        let totalPaidOut = 0;
+        const paymentInvoice = await this.paymentService.findAllByInvoice(invoice.id);
+        paymentInvoice.forEach((payment) => {
+            if (payment.status == PaymentStatusEnum.VERIFIED && payment.active && !payment.deleted) {
+                totalPaidOut += payment.amount
+            }
+        });
+
         if (!invoice) {
             throw new NotFoundException('Invoice not found.')
         }
 
-        if (invoice.total > total) {
+        if (totalPaidOut > total) {
             throw new BadRequestException('No puede editar el precio total.')
         }
 

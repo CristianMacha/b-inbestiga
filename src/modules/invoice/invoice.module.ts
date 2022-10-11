@@ -7,6 +7,7 @@ import {InvoiceService} from './invoice.service';
 import {PersonRoleModule} from "../person-role/person-role.module";
 import {PermissionModule} from "../permission/permission.module";
 import {FeeModule} from "../fee/fee.module";
+import { PaymentModule } from '../payment/payment.module';
 
 @Module({
     imports: [
@@ -14,6 +15,7 @@ import {FeeModule} from "../fee/fee.module";
         PersonRoleModule,
         PermissionModule,
         forwardRef(() => FeeModule),
+        PaymentModule,
     ],
     controllers: [InvoiceController],
     providers: [InvoiceService],
