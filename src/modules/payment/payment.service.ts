@@ -340,6 +340,25 @@ export class PaymentService {
             }
         });
 
+        const fee = await this.feeServices.findOne(paymentDb.conceptId);
+        const paidOutFee = await this.totalPaidOutFee(fee.id);
+        const debtFee = fee.total - paidOutFee;
+        const isIncreasing = paymentDb.amount < payment.amount;
+        const amount = Math.abs(paymentDb.amount - payment.amount);
+        
+        if(paymentDb.amount == payment.amount) { throw new BadGatewayException() }
+
+        const { invoice } = fee;
+        const paymentsInvoice = await this.findAllByInvoice(invoice.id);
+        let paidOutInvoice = 0;
+        paymentsInvoice.forEach((pi) => {
+            if(pi.status == PaymentStatusEnum.VERIFIED) {
+                paidOutInvoice += pi.amount;
+            }
+        });
+
+        if(payment.amount > fee.total) { throw new BadRequestException() }
+
         if (paymentDb.status == PaymentStatusEnum.PROCESSING) {
             paymentDb.amount = payment.amount;
         }
@@ -350,20 +369,36 @@ export class PaymentService {
         }
 
         if(paymentDb.status == PaymentStatusEnum.VERIFIED) {
-            const fee = await this.feeServices.findOne(paymentDb.conceptId);
-            const { invoice } = fee;
+            paymentDb.status = PaymentStatusEnum.VERIFIED;
 
-            if(payment.amount > fee.total) { throw new BadRequestException() }
+            if (isIncreasing && (amount <= debtFee)) {
+                paymentDb.amount += amount;                
 
-            if(fee.status == EFeeStatus.PAID_OUT) {
-                const paymentsByFee = await this.findByConcept(fee.id, PaymentConceptEnum.FEE);
-                if(paymentsByFee.length > 0) {
-                    
+                if (paidOutFee + amount == fee.total) {
+                    fee.status = EFeeStatus.PAID_OUT;
+                    invoice.feesPaidOut += 1;
+                }
+
+                if (paidOutInvoice + amount == invoice.total) {
+                    invoice.status = InvoiceStatusEnum.PAID_OUT;
                 }
             }
+
+            if (!isIncreasing) {
+                paymentDb.amount -= amount;
+                fee.status = EFeeStatus.PARTIAL;
+                invoice.status = InvoiceStatusEnum.PARTIAL;
+                invoice.feesPaidOut -= 1;
+            }
+
         }
 
-        return await this.paymentRepository.save(paymentDb);
+        const connection = getConnection();
+        return await connection.transaction('SERIALIZABLE', async manager => {
+            await manager.save(invoice);
+            await manager.save(fee);
+            return await manager.save(paymentDb);
+        });
     }
 
     private sumTotalPayments(payments: PaymentEntity[]): number {

@@ -121,7 +121,10 @@ export class InvoiceService {
             throw new BadRequestException('No puede editar el precio total.')
         }
 
-        invoice.status = InvoiceStatusEnum.PARTIAL;
+        if(invoice.status == InvoiceStatusEnum.PAID_OUT) {
+            invoice.status = InvoiceStatusEnum.PARTIAL;
+        }
+
         invoice.total = total;
         return await this.invoiceRepository.save(invoice);
     }

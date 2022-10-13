@@ -46,6 +46,6 @@ export class PaymentRepository extends Repository<PaymentEntity> {
             .andWhere('payment.concept=:concept', { concept: PaymentConceptEnum.FEE })
             .getRawOne();
 
-        return total;
+        return +total;
     }
 }

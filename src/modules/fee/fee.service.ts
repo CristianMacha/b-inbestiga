@@ -85,63 +85,67 @@ export class FeeService {
         });
     }
 
-    async updateTotal(feeId: number, feeinfo: { paymentDate: Date, numberFee: number, total: number }): Promise<Fee> {
-        const { numberFee, paymentDate, total } = feeinfo;
-
+    async updateTotal(feeId: number, feeInfo: {paymentDate: Date, numberFee: number, total: number}) {
+        const { numberFee, paymentDate, total } = feeInfo;
         const feeDb = await this.feeRepository.findOne(feeId, {
             relations: ['invoice'],
-            where: {
-                active: true,
-            },
+            where: { active: true }
         });
-        const invoice = feeDb.invoice;
-        if (!feeDb) { throw new NotFoundException('Fee not found.') }
+        const invoiceDb = feeDb.invoice;
+        if(!feeDb) { throw new NotFoundException('Fee not found') }
 
-        const totalPaidOut = await this.paymentService.totalPaidOutFee(feeDb.id);
+        const paidOutFee = await this.paymentService.totalPaidOutFee(feeDb.id);
+        const paymentsByInvoice = await this.paymentService.findAllByInvoice(invoiceDb.id);
+        let paidOutInvoice = 0;
+        const isIncreasing = feeDb.total < total;
+        const amount = Math.abs(feeDb.total - total);
 
-        const invoiceTotalPaidOut = await this.paymentService.findAllByInvoice(invoice.id);
-        let totalInvoicePaidOut = 0;
-        invoiceTotalPaidOut.forEach((pi) => {
-            if (pi.status == PaymentStatusEnum.VERIFIED) {
-                totalInvoicePaidOut += pi.amount;
+        paymentsByInvoice.forEach((pi) => {
+            if(pi.status == PaymentStatusEnum.VERIFIED) {
+                paidOutInvoice += pi.amount;
             }
-        })
+        });
 
-        if (total < totalPaidOut) { throw new BadRequestException('El total debe ser mayor que el monto pagado. ') }
-        if (total == totalPaidOut) {
-            feeDb.status = EFeeStatus.PAID_OUT;
-
-        }
+        if(total < paidOutFee) { throw new BadRequestException() }
 
         const connection = getConnection();
-        const feeUpdated = await connection.transaction('SERIALIZABLE', async manager => {
-            const isIncreasing = (total > feeDb.total);
-            if (isIncreasing) {
-                const amountExtra = total - feeDb.total;
-                invoice.total += amountExtra;
-
-                if (totalPaidOut > 0) {
-                    invoice.status = InvoiceStatusEnum.PARTIAL;
-                    invoice.feesPaidOut -= 1;
-                    feeDb.status = EFeeStatus.PARTIAL;
-                }
-
-                feeDb.total += amountExtra;
+        return await connection.transaction('SERIALIZABLE', async manager => {
+            if(isIncreasing) {
+                invoiceDb.total += amount;
+                feeDb.total += amount;
             } else {
-                if (totalInvoicePaidOut == invoice.total) {
-                    invoice.status = InvoiceStatusEnum.PAID_OUT;
-                }
-                const amountDiscounted = feeDb.total - total;
-                invoice.total -= amountDiscounted;
-                feeDb.total -= amountDiscounted;
+                invoiceDb.total -= amount;
+                feeDb.total -= amount;
             }
+            
+            if(feeDb.status == EFeeStatus.PENDING) {
+
+            }
+
+            if (feeDb.status == EFeeStatus.PARTIAL && !isIncreasing && (total == paidOutFee)) {
+                feeDb.status = EFeeStatus.PAID_OUT;
+                invoiceDb.feesPaidOut += 1;
+            }
+
+            if(feeDb.status == EFeeStatus.PAID_OUT) {
+                feeDb.status = EFeeStatus.PARTIAL;
+                invoiceDb.feesPaidOut -= 1;
+                invoiceDb.status = InvoiceStatusEnum.PARTIAL;
+
+                if(!isIncreasing && (paidOutFee == total)) {
+                    feeDb.status = EFeeStatus.PAID_OUT;
+                    invoiceDb.feesPaidOut += 1;
+                    invoiceDb.status = InvoiceStatusEnum.PAID_OUT;
+                }
+
+            }
+
             feeDb.paymentDate = paymentDate;
             feeDb.numberFee = numberFee;
-            await manager.save(invoice);
+
+            await manager.save(invoiceDb);
             return await manager.save(feeDb);
         });
-
-        return feeUpdated;
     }
 
     async findFeeOrderByNumberFee(invoiceId: number, status: EFeeStatus = EFeeStatus.PAID_OUT) {
