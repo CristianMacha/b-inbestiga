@@ -123,7 +123,7 @@ export class ProjectService {
             const projectCode = await this.nanoService.gProjectCode();
             const newproject = this.projectRepository.create(project);
             if (project.id == 0) {newproject.code = projectCode;}
-            newproject.status = EProjectStatus.PENDING;
+            newproject.status = EProjectStatus.ACCEPTED;
             const newProjectCreated = await manager.save(newproject);
 
             const newInvoice = new Invoice();

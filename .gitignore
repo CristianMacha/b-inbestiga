@@ -1,7 +1,9 @@
 # compiled output
 /dist
 /node_modules
-
+/schemas
+docker-compose.yml
+DockerFile
 .env
 
 # Logs
