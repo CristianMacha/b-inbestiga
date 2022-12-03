@@ -124,6 +124,7 @@ export class ProjectService {
             const newproject = this.projectRepository.create(project);
             if (project.id == 0) {newproject.code = projectCode;}
             newproject.status = EProjectStatus.ACCEPTED;
+            newproject.category = project.category.id ? project.category : null;
             const newProjectCreated = await manager.save(newproject);
 
             const newInvoice = new Invoice();

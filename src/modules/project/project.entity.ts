@@ -79,7 +79,7 @@ export class Project {
     commentaries: Commentary[];
 
     @ManyToOne(() => Category, (category) => category.projects, {
-        nullable: false,
+        nullable: true,
     })
     category: Category;
 }

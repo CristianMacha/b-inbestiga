@@ -65,7 +65,7 @@ export class ProjectRepository extends Repository<Project> {
             .innerJoinAndSelect('project.personProjects', 'personProject')
             .innerJoinAndSelect('personProject.person', 'person')
             .innerJoinAndSelect('person.user', 'user')
-            .innerJoinAndSelect('project.category', 'category')
+            //.innerJoinAndSelect('project.category', 'category')
 
         if (withInvoice === 'true') {
             query.innerJoinAndSelect('project.invoices', 'invoice');
