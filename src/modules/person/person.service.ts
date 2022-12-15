@@ -15,6 +15,7 @@ import { PersonRole } from '../person-role/person-role.entity';
 import { PersonRoleService } from '../person-role/person-role.service';
 import { ResponseListInterface } from '../../core/interfaces/response.interface';
 import { PersonFilterInterface } from '../../core/interfaces/person.interface';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class PersonService {
@@ -24,6 +25,7 @@ export class PersonService {
     private nanoidServices: NanoidService,
     private roleServices: RoleService,
     private personRoleService: PersonRoleService,
+    private userService: UserService,
   ) {}
 
   async findByNameAndRole(
@@ -34,6 +36,10 @@ export class PersonService {
   }
 
   async create(person: Person): Promise<Person> {
+    const emailExist = await this.userService.findByEmail(person.user.email);
+    if (emailExist) {
+      throw new BadRequestException('Email ya registrado');
+    }
     const connection = getConnection();
     return await connection.transaction('SERIALIZABLE', async (manager) => {
       let userPassword: string;
@@ -107,6 +113,11 @@ export class PersonService {
   }
 
   async update(person: Person): Promise<Person> {
+    const emailExist = await this.userService.findByEmail(person.user.email);
+    if (emailExist) {
+      throw new BadRequestException('Email ya registrado');
+    }
+
     const personDb = await this.personRepository.preload(person);
     if (!personDb) {
       throw new NotFoundException('Person not found.');
